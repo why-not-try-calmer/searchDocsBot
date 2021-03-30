@@ -45,9 +45,9 @@ const handle = (req, res, next) => {
     const found_in_parse = parsed(message_text)
     if (found_in_parse !== null) {
         search_handle(found_in_parse).then(res => {
-            const user = username === undefined ? "anonymous" : "@" + username 
+            const user = username === undefined ? '' : '@' + username + '\n'
             const text = res !== null
-                ? user + '\n' + res
+                ? user + res
                 : 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
             const optParams = { reply_to_message_id: parseInt(message_id) }
             slimbot.sendMessage(chat_id, text, optParams)
