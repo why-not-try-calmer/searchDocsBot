@@ -49,7 +49,7 @@ const handle = (req, res, next) => {
             const text = res !== null
                 ? user + '\n' + res
                 : 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
-            const optParams = { reply_to_message_id: parseInt(message_id), parse_mode: "Markdown" }
+            const optParams = { reply_to_message_id: parseInt(message_id) }
             slimbot.sendMessage(chat_id, text, optParams)
         }).catch(err => console.error(err))
     }
