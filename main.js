@@ -20,6 +20,10 @@ const parsed = s => {
     return null
 }
 
+const escaped = s => {
+    s.reduce
+}
+
 const handle = (req, res, next) => {
     const update = req.body
     if (!update.message || !update.message.message_id || !update.message.text || !update.message.chat.id) {
@@ -33,15 +37,17 @@ const handle = (req, res, next) => {
     const user_id = message.from.id
     const username = message.from.username
     if (message_text.slice(0, 6) === '/start') {
-        slimbot.sendMessage(chat_id, text = 'Search in the docs by simply sending a message following this pattern: \n<search for these words> ' + MENTION + '\nor\n/docs <search for these words>')
+        const text = 'Search in the docs by simply sending a message following this pattern: \n<search for these words> ' + MENTION + '\nor\n/docs <search for these words>'
+        slimbot.sendMessage(chat_id, text)
         res.send(200)
         return next()
     }
     const found_in_parse = parsed(message_text)
     if (found_in_parse !== null) {
         search_handle(found_in_parse).then(res => {
+            const user = username === undefined ? '' : '@' + username + '\n'
             const text = res !== null
-                ? res
+                ? user + res
                 : 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
             const optParams = { reply_to_message_id: parseInt(message_id) }
             slimbot.sendMessage(chat_id, text, optParams)
