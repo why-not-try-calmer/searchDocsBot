@@ -17,7 +17,7 @@ const search = (s, blob) => {
     return idx.search(s).map(x => docs_url + '/' + x.ref).join('\n')
 }
 
-const blob = (() => {
+const getSetBlob = (() => {
     let _b = null
     return (b = null) => {
         if (b === null) return _b
@@ -25,7 +25,7 @@ const blob = (() => {
     }
 })()
 
-const checkLastTime = (() => {
+const needsARefresh = (() => {
     const offset = 86400
     let last_time = new Date().getSeconds()
     return () => {
@@ -39,18 +39,19 @@ const checkLastTime = (() => {
 })()
 
 const handler = search_string => {
-    if (!checkLastTime() && (blob() !== null)) {
-        console.log(search(search_string, blob()))
+    if (!needsARefresh() && (getSetBlob() !== null)) {
+        console.log(search(search_string, getSetBlob()))
         return;
     }
     return fetch(json_blob_url)
         .then(res => res.json())
         .then(res => {
-            blob(res)
-            console.log(search(search_string, blob()))
+            getSetBlob(res)
+            console.log(search(search_string, getSetBlob()))
         })
         .catch(e => console.error(e))
 }
+
 /*
 setTimeout(() => {
     handler('btrfs')
