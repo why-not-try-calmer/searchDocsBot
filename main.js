@@ -8,9 +8,10 @@ server.use(restify.plugins.bodyParser());
 
 const handle = (req, res, next) => {
   const update = req.body
-  const chat = update.message
-  console.log(chat)
-  slimbot.sendMessage(chat.id, "Ok, thanks for letting me know")
+  const message = update.message
+  const message_id = message.message_id
+  console.log(message)
+  slimbot.sendMessage(chat_id=message.chat.id, reply_to_message_id=message_id, text="Ok, thanks for letting me know")
   res.send('ok');
   return next();
 }
