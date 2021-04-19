@@ -38,14 +38,15 @@ const needsARefresh = (() => {
 
 const search_handle = search_string => {
     if (!needsARefresh() && (getSetBlob() !== null)) {
-        return Promise.resolve(search(search_string, getSetBlob()))
+        const found = search(search_string, getSetBlob())
+        return found.length < 1 ? Promise.resolve(null) : Promise.resolve(found)
     }
     return fetch(JSON_BLOB_URL)
         .then(res => res.json())
         .then(res => {
             getSetBlob(res)
             const found = search(search_string, getSetBlob())
-            return found.length < 1 ? null : res
+            return found.length < 1 ? null : found
         })
         .catch(e => console.error(e))
 }
