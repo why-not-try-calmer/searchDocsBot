@@ -8,6 +8,7 @@ server.use(restify.plugins.bodyParser());
 
 const handle = (req, res, next) => {
   res.send('hello');
+  console.log(req)
   return next();
 }
 
