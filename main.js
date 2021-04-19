@@ -7,7 +7,7 @@ let server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 
 const parsed = s => {
-    const mention = '@opensuse_docs_bot'
+    const mention = '@openSUSE_docs_bot'
     const command = '/docs'
     const head = s.slice(0, 5)
     if (head === command) return s.slice(6)
