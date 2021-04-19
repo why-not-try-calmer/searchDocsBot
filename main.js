@@ -13,8 +13,8 @@ slimbot.setWebhook({ url: process.env['BASE_URL'] || 'https://opensuse-docs-bot.
 slimbot.getWebhookInfo();
 
 const handle = (req, res, next) => {
-  res.send('hello ' + req.params.name);
-  next();
+  res.send('hello');
+  return next();
 }
 
 // Handle updates (example)
