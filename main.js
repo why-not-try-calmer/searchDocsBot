@@ -4,7 +4,6 @@ const restify = require('restify');
 const search_handle = require('./lib.js')
 
 let server = restify.createServer();
-
 server.use(restify.plugins.bodyParser());
 
 const parsed = s => {
@@ -28,14 +27,17 @@ const handle = (req, res, next) => {
     const found_in_parse = parsed(message_text)
     console.log("Found in parse", found_in_parse)
     if (found_in_parse !== null) {
-        const found_in_docs = search_handle(found_in_parse) || 'No result about this yet, but keep tabs on https://opensuse.github.io/openSUSE-docs-revamped in the upcoming days.'
-        console.log("Found in docs", found_in_docs)
-        slimbot.sendMessage(chat_id, text = found_in_docs, reply_to_message_id = message_id)
+        search_handle(found_in_parse).then(res => {
+            const found_in_docs = res === null
+                ? 'No result about this yet, but keep tabs on https://opensuse.github.io/openSUSE-docs-revamped in the upcoming days.'
+                : res
+            console.log("Found in docs", found_in_docs)
+            slimbot.sendMessage(chat_id, text = found_in_docs, reply_to_message_id = message_id)
+        })
     }
     res.send(200);
     return next();
 }
 
 server.post('/bot_updates', handle)
-
 server.listen(process.env['PORT'] || 8443);
