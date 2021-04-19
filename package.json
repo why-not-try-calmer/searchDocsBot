@@ -1,0 +1,8 @@
+{
+  "dependencies": {
+    "lunr": "^2.3.9",
+    "node-fetch": "^2.6.1",
+    "restify": "^8.5.1",
+    "slimbot": "^5.1.0"
+  }
+}
