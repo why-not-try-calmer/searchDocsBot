@@ -44,8 +44,8 @@ const search_handle = search_string => {
         .then(res => res.json())
         .then(res => {
             getSetBlob(res)
-            const res = search(search_string, getSetBlob())
-            return res.length < 1 ? null : res
+            const found = search(search_string, getSetBlob())
+            return found.length < 1 ? null : res
         })
         .catch(e => console.error(e))
 }
