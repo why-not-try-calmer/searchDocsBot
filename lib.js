@@ -1,10 +1,9 @@
 #!/usr/local/bin/node
-const fs = require('fs');
 const lunr = require('lunr')
 const fetch = require('node-fetch')
 
-const docs_url = 'https://opensuse.github.io/openSUSE-docs-revamped'
-const json_blob_url = 'https://raw.githubusercontent.com/openSUSE/openSUSE-docs-revamped/gh-pages/search/search_index.json'
+const DOCS_URL = 'https://opensuse.github.io/openSUSE-docs-revamped'
+const JSON_BLOB_URL = 'https://raw.githubusercontent.com/openSUSE/openSUSE-docs-revamped/gh-pages/search/search_index.json'
 
 const search = (s, blob) => {
     const idx = lunr(function () {
@@ -14,7 +13,7 @@ const search = (s, blob) => {
             this.add(doc)
         }, this)
     })
-    return idx.search(s).map(x => docs_url + '/' + x.ref).join('\n')
+    return idx.search(s).map(l => DOCS_URL + '/' + l.ref).join('\n')
 }
 
 const getSetBlob = (() => {
@@ -26,10 +25,10 @@ const getSetBlob = (() => {
 })()
 
 const needsARefresh = (() => {
-    const offset = 86400
-    let last_time = new Date().getSeconds()
+    const offset = 604800000
+    let last_time = new Date().getTime()
     return () => {
-        const now = new Date().getSeconds()
+        const now = new Date().getTime()
         if ((now - last_time) > offset) {
             last_time = now
             return true
@@ -38,12 +37,12 @@ const needsARefresh = (() => {
     }
 })()
 
-const handler = search_string => {
+const search_handle = search_string => {
     if (!needsARefresh() && (getSetBlob() !== null)) {
         console.log(search(search_string, getSetBlob()))
         return;
     }
-    return fetch(json_blob_url)
+    return fetch(JSON_BLOB_URL)
         .then(res => res.json())
         .then(res => {
             getSetBlob(res)
@@ -52,8 +51,4 @@ const handler = search_string => {
         .catch(e => console.error(e))
 }
 
-/*
-setTimeout(() => {
-    handler('btrfs')
-}, 2000)
-*/
+module.exports = search_handle
