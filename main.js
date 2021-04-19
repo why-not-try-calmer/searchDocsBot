@@ -15,7 +15,7 @@ slimbot.getWebhookInfo();
 // Handle updates (example)
 server.post('/bot_updates', function handle(req, res) {
   let update = req.body;
-  console.log(update)
+  res.send('hello ' + req.params.name);
   // handle type of update here...
   // i.e. if (update.message) { ... }
 });
