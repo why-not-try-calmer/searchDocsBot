@@ -30,6 +30,8 @@ const handle = (req, res, next) => {
     const message_id = message.message_id
     const message_text = message.text
     const chat_id = message.chat.id
+    const user_id = message.from.id
+    const username = message.from.username
     if (message_text.slice(0, 6) === '/start') {
         slimbot.sendMessage(chat_id, text = 'Search in the docs by simply sending a message following this pattern: \n<search for these words> ' + MENTION + '\nor\n/docs <search for these words>')
         res.send(200)
@@ -39,9 +41,9 @@ const handle = (req, res, next) => {
     if (found_in_parse !== null) {
         search_handle(found_in_parse).then(res => {
             const text = res !== null
-                ? res
+                ? res + '['+ username + '](tg://user?id=' + user_id + ')'
                 : 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days.'
-            const optParams = { reply_to_message_id: parseInt(message_id) }
+            const optParams = { reply_to_message_id: parseInt(message_id), parse_mode: "MarkdownV2" }
             slimbot.sendMessage(chat_id, text, optParams)
         }).catch(err => console.error(err))
     }
