@@ -28,12 +28,12 @@ const handle = (req, res, next) => {
     console.log("Found in parse", found_in_parse)
     if (found_in_parse !== null) {
         search_handle(found_in_parse).then(res => {
-            const found_in_docs = res === null
+            const text = res === null
                 ? 'No result about this yet, but keep tabs on https://opensuse.github.io/openSUSE-docs-revamped in the upcoming days.'
                 : res
-            console.log("Found in docs", found_in_docs)
-            slimbot.sendMessage(chat_id, text = found_in_docs, reply_to_message_id = message_id)
-        })
+            console.log("Found in docs", text)
+            slimbot.sendMessage(chat_id, text, reply_to_message_id = message_id)
+        }).catch(err => console.error(err))
     }
     res.send(200);
     return next();
