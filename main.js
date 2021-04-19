@@ -28,7 +28,11 @@ const handle = (req, res, next) => {
     const message_id = message.message_id
     const message_text = message.text
     const chat_id = message.chat.id
-    if (message_text.slice(0, 6) === '/start') slimbot.sendMessage(chat_id, text = 'Search in the docs by simply sending a message followint this pattern: \n<search for these words> @opensuse_docs" or \n"/docs <search for these words>')
+    if (message_text.slice(0, 6) === '/start') {
+        slimbot.sendMessage(chat_id, text = 'Search in the docs by simply sending a message followint this pattern: \n<search for these words> @opensuse_docs" or \n"/docs <search for these words>')
+        res.send(200)
+        return next()
+    }
     const found_in_parse = parsed(message_text)
     if (found_in_parse !== null) {
         search_handle(found_in_parse).then(res => {
