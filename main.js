@@ -27,7 +27,7 @@ const handle = (req, res, next) => {
     const chat_id = message.chat.id
     const found_in_parse = parsed(message_text)
     if (found_in_parse !== null) {
-        const found_in_docs = search_handle(found_in_parse)
+        const found_in_docs = search_handle(found_in_parse) || 'No result about this yet, but keep tabs on https://opensuse.github.io/openSUSE-docs-revamped in the upcoming days.'
         slimbot.sendMessage(chat_id, text = found_in_docs, reply_to_message_id = message_id)
     }
     res.send(200);

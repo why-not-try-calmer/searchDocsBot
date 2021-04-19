@@ -39,14 +39,13 @@ const needsARefresh = (() => {
 
 const search_handle = search_string => {
     if (!needsARefresh() && (getSetBlob() !== null)) {
-        console.log(search(search_string, getSetBlob()))
-        return;
+        return (search(search_string, getSetBlob()))
     }
     return fetch(JSON_BLOB_URL)
         .then(res => res.json())
         .then(res => {
             getSetBlob(res)
-            console.log(search(search_string, getSetBlob()))
+            return search(search_string, getSetBlob())
         })
         .catch(e => console.error(e))
 }
