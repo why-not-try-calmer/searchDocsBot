@@ -14,7 +14,7 @@ const parsed = s => {
     const head = s.slice(0, 5)
     if (head === COMMAND) return s.slice(6)
     if (s.includes(MENTION)) {
-        const res = s.split(MENTION).sort((a, b) => b.length - a.length)[0]
+        const res = s.split(MENTION).sort((a, b) => a.length - b.length).pop()
         if (res.length > 0) return res
     }
     return null
@@ -45,8 +45,8 @@ const handle = (req, res, next) => {
             slimbot.sendMessage(chat_id, text, optParams)
         }).catch(err => console.error(err))
     }
-    res.send(200);
-    return next();
+    res.send(200)
+    return next()
 }
 
 server.post('/bot_updates', handle)
