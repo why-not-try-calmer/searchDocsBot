@@ -4,9 +4,6 @@ const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN']);
 // const restifyBodyParser = require('restify-plugins').bodyParser;
 
 const search_handle = require ('./lib.js')
-
-const Slimbot = require('slimbot');
-const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN']);
  
 // Register listeners
  
