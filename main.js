@@ -1,10 +1,12 @@
 const Slimbot = require('slimbot');
 const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN']);
 const restify = require('restify');
+const restifyBodyParser = require('restify-plugins').bodyParser;
+
 const search_handle = require ('./lib.js')
 
 let server = restify.createServer();
-server.use(restify.bodyParser());
+server.use(restifyBodyParser());
 
 // Setup webhook integration
 slimbot.setWebhook({ url: process.env['BASE_URL'] });
