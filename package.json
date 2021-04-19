@@ -4,5 +4,8 @@
     "node-fetch": "^2.6.1",
     "restify": "^8.5.1",
     "slimbot": "^5.1.0"
+  },
+  "scripts": {
+    "start": "node main.js"
   }
 }

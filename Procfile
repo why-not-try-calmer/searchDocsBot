@@ -1,1 +1,1 @@
-web: npm run main.js
+web: npm start
