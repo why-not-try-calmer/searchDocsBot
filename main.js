@@ -1,5 +1,5 @@
 const Slimbot = require('slimbot');
-const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN'] || '1746181670:AAGGB9trk_ro8lRlLztjtI5Mw8DiptcnqFs');
+const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN']);
 const restify = require('restify');
 const search_handle = require('./lib.js')
 
@@ -26,8 +26,10 @@ const handle = (req, res, next) => {
     const message_text = message.text
     const chat_id = message.chat.id
     const found_in_parse = parsed(message_text)
+    console.log("Found in parse", found_in_parse)
     if (found_in_parse !== null) {
         const found_in_docs = search_handle(found_in_parse) || 'No result about this yet, but keep tabs on https://opensuse.github.io/openSUSE-docs-revamped in the upcoming days.'
+        console.log("Found in docs", found_in_docs)
         slimbot.sendMessage(chat_id, text = found_in_docs, reply_to_message_id = message_id)
     }
     res.send(200);
