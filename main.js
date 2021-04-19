@@ -14,4 +14,4 @@ const handle = (req, res, next) => {
 
 server.post('/bot_updates', handle)
 
-server.listen(8443);
+server.listen(process.env['PORT'] || 8443);
