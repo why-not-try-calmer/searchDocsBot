@@ -24,14 +24,13 @@ const handle = (req, res, next) => {
     const message_id = message.message_id
     const message_text = message.text
     const chat_id = message.chat.id
+    if (message_text.slice(0, 6) === '/start') slimbot.sendMessage(chat_id, text = 'Search in the docs by simply sending a message followint this pattern: \n<search for these words> @opensuse_docs" or \n"/docs <search for these words>')
     const found_in_parse = parsed(message_text)
-    console.log("Found in parse", found_in_parse)
     if (found_in_parse !== null) {
         search_handle(found_in_parse).then(res => {
             const text = res === null
                 ? 'No result about this yet, but keep tabs on https://opensuse.github.io/openSUSE-docs-revamped in the upcoming days.'
                 : res
-            console.log("Found in docs", text)
             slimbot.sendMessage(chat_id, text, reply_to_message_id = message_id)
         }).catch(err => console.error(err))
     }
