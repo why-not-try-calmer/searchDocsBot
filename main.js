@@ -7,8 +7,10 @@ let server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 
 const handle = (req, res, next) => {
-  res.send('hello');
-  console.log(res)
+  const update = req.body
+  const chat = update.message
+  console.log(chat)
+  res.send('ok');
   return next();
 }
 
