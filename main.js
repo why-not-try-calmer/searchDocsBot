@@ -10,6 +10,7 @@ const handle = (req, res, next) => {
   const update = req.body
   const chat = update.message
   console.log(chat)
+  slimbot.sendMessage(chat.id, "Ok, thanks for letting me know")
   res.send('ok');
   return next();
 }
