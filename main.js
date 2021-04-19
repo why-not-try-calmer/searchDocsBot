@@ -7,8 +7,8 @@ let server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 
 const MENTION = process.env['BOT_IDENTIFIER']
-const COMMAND = '/docs'
 const DOCS_URL = process.env['DOCS_URL']
+const COMMAND = '/docs'
 
 const parsed = s => {
     const head = s.slice(0, 5)
