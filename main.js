@@ -29,7 +29,7 @@ const handle = (req, res, next) => {
     const message_text = message.text
     const chat_id = message.chat.id
     if (message_text.slice(0, 6) === '/start') {
-        slimbot.sendMessage(chat_id, text = 'Search in the docs by simply sending a message followint this pattern: \n<search for these words> @opensuse_docs" or \n"/docs <search for these words>')
+        slimbot.sendMessage(chat_id, text = 'Search in the docs by simply sending a message following this pattern: \n<search for these words> @opensuse_docs\nor\n/docs <search for these words>')
         res.send(200)
         return next()
     }
