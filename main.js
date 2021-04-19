@@ -1,6 +1,7 @@
 const Slimbot = require('slimbot');
 const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN'] || '1746181670:AAGGB9trk_ro8lRlLztjtI5Mw8DiptcnqFs');
 const restify = require('restify');
+const search_handle = require ('./lib.js')
 
 let server = restify.createServer();
 
