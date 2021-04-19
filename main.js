@@ -6,12 +6,14 @@ const search_handle = require('./lib.js')
 let server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 
+const MENTION = process.env['BOT_IDENTIFIER']
+const COMMAND = '/docs'
+const DOCS_URL = process.env['DOCS_URL']
+
 const parsed = s => {
-    const mention = '@openSUSE_docs_bot'
-    const command = '/docs'
     const head = s.slice(0, 5)
-    if (head === command) return s.slice(6)
-    if (s.includes(mention)) {
+    if (head === COMMAND) return s.slice(6)
+    if (s.includes(MENTION)) {
         const res = s.split(mention).sort((a, b) => b.length - a.length)[0]
         if (res.length > 0) return res
     }
@@ -29,7 +31,7 @@ const handle = (req, res, next) => {
     const message_text = message.text
     const chat_id = message.chat.id
     if (message_text.slice(0, 6) === '/start') {
-        slimbot.sendMessage(chat_id, text = 'Search in the docs by simply sending a message following this pattern: \n<search for these words> @openSUSE_docs_bot\nor\n/docs <search for these words>')
+        slimbot.sendMessage(chat_id, text = 'Search in the docs by simply sending a message following this pattern: \n<search for these words> ' + MENTION + '\nor\n/docs <search for these words>')
         res.send(200)
         return next()
     }
@@ -37,7 +39,7 @@ const handle = (req, res, next) => {
     if (found_in_parse !== null) {
         search_handle(found_in_parse).then(res => {
             const text = res === null
-                ? 'No result about this yet, but keep tabs on https://opensuse.github.io/openSUSE-docs-revamped in the upcoming days.'
+                ? 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days.'
                 : res
             slimbot.sendMessage(chat_id, text, reply_to_message_id = message_id)
         }).catch(err => console.error(err))
