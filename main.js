@@ -14,7 +14,7 @@ const parsed = s => {
     const head = s.slice(0, 5)
     if (head === COMMAND) return s.slice(6)
     if (s.includes(MENTION)) {
-        const res = s.split(mention).sort((a, b) => b.length - a.length)[0]
+        const res = s.split(MENTION).sort((a, b) => b.length - a.length)[0]
         if (res.length > 0) return res
     }
     return null
