@@ -42,8 +42,8 @@ const handle = (req, res, next) => {
         search_handle(found_in_parse).then(res => {
             const text = res !== null
                 ? res + '['+ username + '](tg://user?id=' + user_id + ')'
-                : 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days.'
-            const optParams = { reply_to_message_id: parseInt(message_id), parse_mode: "MarkdownV2" }
+                : 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
+            const optParams = { reply_to_message_id: parseInt(message_id), parse_mode: "Markdown" }
             slimbot.sendMessage(chat_id, text, optParams)
         }).catch(err => console.error(err))
     }
