@@ -6,18 +6,11 @@ let server = restify.createServer();
 
 server.use(restify.plugins.bodyParser());
 
-// Setup webhook integration
-slimbot.setWebhook({ url: process.env['BASE_URL'] || 'https://opensuse-docs-bot.herokuapp.com/bot_updates'});
-
-// Get webhook status
-slimbot.getWebhookInfo();
-
 const handle = (req, res, next) => {
   res.send('hello');
   return next();
 }
 
-// Handle updates (example)
 server.post('/bot_updates', handle)
 
 server.listen(8443);
