@@ -1,25 +1,24 @@
 const Slimbot = require('slimbot');
 const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN']);
-const restify = require('restify');
-const restifyBodyParser = require('restify-plugins').bodyParser;
+// const restify = require('restify');
+// const restifyBodyParser = require('restify-plugins').bodyParser;
 
 const search_handle = require ('./lib.js')
 
-let server = restify.createServer();
-server.use(restifyBodyParser());
-
+const Slimbot = require('slimbot');
+const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN']);
+ 
+// Register listeners
+ 
+slimbot.on('message', message => {
+  slimbot.sendMessage(message.chat.id, 'Message received');
+});
+ 
 // Setup webhook integration
-slimbot.setWebhook({ url: process.env['BASE_URL'] });
-
+slimbot.setWebhook('https://www.example.com');
+ 
 // Get webhook status
 slimbot.getWebhookInfo();
-
-// Handle updates (example)
-server.post('/bot_updates', function handle(req, res) {
-  let update = req.body;
-  res.send('hello ' + req.params.name);
-  // handle type of update here...
-  // i.e. if (update.message) { ... }
-});
-
-server.listen(8443);
+ 
+// Teardown webhook integration
+slimbot.deleteWebhook();
