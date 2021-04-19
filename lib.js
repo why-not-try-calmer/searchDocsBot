@@ -1,4 +1,3 @@
-#!/usr/local/bin/node
 const lunr = require('lunr')
 const fetch = require('node-fetch')
 
@@ -13,7 +12,7 @@ const search = (s, blob) => {
             this.add(doc)
         }, this)
     })
-    return idx.search(s).slice(0,5).map(l => '-' + DOCS_URL + '/' + l.ref).join('\n')
+    return idx.search(s).slice(0, 3).map(l => '- ' + DOCS_URL + '/' + l.ref).join('\n')
 }
 
 const getSetBlob = (() => {
