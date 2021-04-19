@@ -20,6 +20,10 @@ const parsed = s => {
 
 const handle = (req, res, next) => {
     const update = req.body
+    if (!update.message || !update.message.message_id|| !update.message.text || !update.message.chat.id) {
+        res.send(200)
+        return next()
+    }
     const message = update.message
     const message_id = message.message_id
     const message_text = message.text
