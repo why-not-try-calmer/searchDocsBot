@@ -49,8 +49,6 @@ const bot_handle = (req, res, next) => {
                 : 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
             const optParams = { reply_to_message_id: parseInt(message_id) }
             slimbot.sendMessage(chat_id, text, optParams)
-            res.send(200)
-            return next()
         }).catch(err => console.error(err))
     }
     res.send(200)
