@@ -39,32 +39,30 @@ const bot_handle = (req, res, next) => {
     if (message_text.slice(0, 6) === '/start') {
         const text = 'Search in the docs by simply sending a message following this pattern: \n<search for these words> ' + MENTION + '\nor\n/docs <search for these words>'
         slimbot.sendMessage(chat_id, text)
-        res.send(200)
-        return next()
     }
     const found_in_parse = parsed(message_text)
     if (found_in_parse !== null) {
-        return search_handle(found_in_parse).then(found => {
+        search_handle(found_in_parse).then(found => {
             const user = username === undefined ? '' : '@' + username + '\n'
             const text = found !== null
                 ? user + found
                 : 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
             const optParams = { reply_to_message_id: parseInt(message_id) }
             slimbot.sendMessage(chat_id, text, optParams)
-            res.send(200)
-            return next()
         }).catch(err => console.error(err))
     }
+    res.send(200)
+    return next()
 }
 
 const web_handle = (req, res, next) => {
     const searchwords = req.params.searchwords
-    return search_handle(searchwords).then(found => {
+    search_handle(searchwords).then(found => {
         if (found === null) found = 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
-        res.contentType = 'json'
-        res.send({ searchwords, found })
-        return next()
     })
+    res.contentType = 'json'
+    res.send({ searchwords, found })
+    return next()
 }
 
 server.post('/bot_updates', bot_handle)
