@@ -63,9 +63,8 @@ const bot_handler = (req, res, next) => {
                 slimbot.sendMessage(chat_id, text, optParams)
                 return;
             }
-            getSetUser({ user_id, user_name, results: found_threesomes })
+            // getSetUser({ user_id, user_name, results: found_threesomes })
             console.log(found_threesomes)
-            console.log(found_threesomes[0])
             text = user + found_threesomes[0].join('\n')
             optParams.reply_markup = JSON.stringify({
                 inline_keyboard: [[
