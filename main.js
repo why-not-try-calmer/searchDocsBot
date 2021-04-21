@@ -48,7 +48,7 @@ const bot_handler = (req, res, next) => {
     if (update.callback_query && update.callback_query.data && update.callback_query.message.message_id) {
         const message_id = update.callback_query.message.message_id
         const [bot_name, chat_id, user_id, queried_index] = update.callback_query.data.split(':')
-        if (bot_name !== 'docs-bot' || [bot_name, chat_id, user_id, current_index].any(x => x === undefined || x === null)) {
+        if (bot_name !== 'docs-bot' || [bot_name, chat_id, user_id, queried_index].any(x => x === undefined || x === null)) {
             res.send(200)
             return next()
         }
