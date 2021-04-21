@@ -3,6 +3,9 @@ const fetch = require('node-fetch')
 
 const DOCS_URL = process.env['DOCS_URL']
 const JSON_BLOB_URL = process.env['JSON_BLOB_URL']
+const MENTION = process.env['MENTION']
+const COMMAND = '/docs'
+
 
 const needsARefresh = (() => {
     const offset = 604800000
