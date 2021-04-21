@@ -12,7 +12,7 @@ const search = (s, blob) => {
             this.add(doc)
         }, this)
     })
-    return idx.search(s)//.map(l => '- ' + DOCS_URL + '/' + l.ref)
+    return idx.search(s).map(l => '- ' + DOCS_URL + '/' + l.ref)
 }
 
 const getSetBlob = (() => {
