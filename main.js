@@ -38,9 +38,8 @@ const query_handler = update => {
     const text = Users.g(user_id).partitioned[current_index].join('\n')
     let payload = [{ text: 'Next ' + (current_index + 1).toString() + '/' + Users.g(user_id).partitioned.length.toString(), callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() }]
     if (current_index > 0) payload.unshift({ text: 'Previous', callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() })
-    inline_keyboard = [[payload]]
     let optParams = {}
-    optParams.reply_markup = JSON.stringify({ inline_keyboard })
+    optParams.reply_markup = JSON.stringify({ inline_keyboard: [payload] })
 
     slimbot.editMessageText(chat_id, message_id, text, optParams)
     Users.s(user_id, { current_index: current_index + 1 })
@@ -98,7 +97,7 @@ const bot_handler = (req, res, next) => {
             optParams.reply_markup = JSON.stringify({
                 inline_keyboard: [[
                     {
-                        text: 'Next ' + '1 /' + partitioned.length.toString(),
+                        text: 'Next' + '1/' + partitioned.length.toString(),
                         callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + "1"
                     }
                 ]]
