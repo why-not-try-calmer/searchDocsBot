@@ -99,7 +99,7 @@ const bot_handler = (req, res, next) => {
             text = user + partitioned[0].join('\n')
             optParams.reply_markup = JSON.stringify({
                 inline_keyboard: [[
-                    { text: 'Next ' + (1).toString() + '/' + partitioned.length.toString(), callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() }
+                    { text: 'Next ' + (1).toString() + '/' + partitioned.length.toString(), callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + "1" }
                 ]]
             })
             slimbot.sendMessage(chat_id, text, optParams)
