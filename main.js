@@ -36,7 +36,7 @@ const query_handler = update => {
 
     const current_index = parseInt(qindex)
     const text = Users.g(user_id).partitioned[current_index].join('\n')
-    let payload = [{ text: 'Next ' + (current_index + 1).toString() + '/' + Users.get(user_id).partitioned.length.toString(), callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() }]
+    let payload = [{ text: 'Next ' + (current_index + 1).toString() + '/' + Users.g(user_id).partitioned.length.toString(), callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() }]
     if (current_index > 0) payload.unshift({ text: 'Previous', callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() })
     inline_keyboard = [[payload]]
     let optParams = {}
