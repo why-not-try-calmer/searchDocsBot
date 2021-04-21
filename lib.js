@@ -39,7 +39,7 @@ const search = (s, blob) => {
 const search_handle = search_string => {
     if (!needsARefresh() && (getSetBlob() !== null)) {
         const found = search(search_string, getSetBlob())
-        return found.length < 1 ? Promise.resolve(null) : Promise.resolve(found)
+        return Promise.resolve(found)
     }
     return fetch(JSON_BLOB_URL)
         .then(res => res.json())

@@ -11,13 +11,19 @@ const DOCS_URL = 'https://opensuse.github.io/openSUSE-docs-revamped'
 const COMMAND = '/docs'
 
 const getSetUser = (() => {
-    let user_ids = {}
-    return ({ user_id, user_name = null, results = null, current_index = null }) => {
-        if (!user_ids[user_id]) user_ids[user_id] = { user_name, results }
-        if (results === null) return { results: user_ids[user_id].results, user_name: user_ids[user_id].user_name }
-        user_ids[user_id].results = results
-        user_ids[user_id].user_name = user_name
-        user_ids[user_id].current_index = current_index
+    let users = {}
+    const create = user_id => {
+        const user = { user_id, user_name: '', found: [], current_index: null, message_id: null }
+        users[user_id] = user
+    }
+    const get = user_id => users[user_id]
+    const set = (user_id, update_with) => {
+        users[user_id] = Object.assign(users[user_id], update_with)
+    }
+    return ({ user_id, user_name = null, found = null, current_index = null, message_id = null }) => {
+        if (!user[user_id]) create(user_id)
+        if ([current_index, message_id].any(i => i === null || undefined)) return get(user_id)
+        set(user_id, { current_index, message_id, found, user_name: user_name || null })
     }
 })()
 
@@ -39,7 +45,26 @@ const partition = arr => arr.reduce((acc, val, i) => {
 
 const bot_handler = (req, res, next) => {
     const update = req.body
-    console.log(update)
+    if (update.callback_query && update.callback_query.data && update.callback_query.message.message_id) {
+        const message_id = update.callback_query.message.message_id
+        const [bot_name, chat_id, user_id, queried_index] = update.callback_query.data.split(':')
+        if (bot_name !== 'docs-bot' || [bot_name, chat_id, user_id, current_index].any(x => x === undefined || x === null)) {
+            res.send(200)
+            return next()
+        }
+        const current_index = parseInt(queried_index)
+        const user = getSetUser({ user_id })
+        const text = user.found[queried_index_int].join('\n')
+        let optParams = {}
+        optParams.reply_markup = JSON.stringify({
+            inline_keyboard: [[
+                { text: 'Next ' + (1).toString() + '/' + partitioned.length.toString(), callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() }
+            ]]
+        })
+        slimbot.editMessageText(chat_id, message_id, text, optParams)
+        getSetUser({ user_id, message_id, current_index })
+        return;
+    }
     if (!update.message || !update.message.message_id || !update.message.text || !update.message.chat.id) {
         res.send(200)
         return next()
@@ -60,26 +85,25 @@ const bot_handler = (req, res, next) => {
             const user = user_name === undefined ? '' : '@' + user_name + '\n'
             let text;
             let optParams = { reply_to_message_id: parseInt(message_id) }
-            if (found === null) {
+            if (found.length === 0) {
                 text = 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
                 slimbot.sendMessage(chat_id, text, optParams)
                 return;
             }
             const partitioned = partition(found)
-            console.log(partitioned)
             if (partitioned.length === 1) {
                 text = user + partitioned[0].join('\n')
                 slimbot.sendMessage(chat_id, text, optParams)
                 return;
             }
-            // getSetUser({ user_id, user_name, results: found_threesomes })
             text = user + partitioned[0].join('\n')
             optParams.reply_markup = JSON.stringify({
                 inline_keyboard: [[
-                    { text: 'Next ' + (1).toString() + '/' + partitioned.length.toString(), callback_data: 'nextPage' }
+                    { text: 'Next ' + (1).toString() + '/' + partitioned.length.toString(), callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() }
                 ]]
             })
             slimbot.sendMessage(chat_id, text, optParams)
+            getSetUser({ current_index: 0, user_id, user_name, found })
         }).catch(err => console.error(err))
     }
     res.send(200)
