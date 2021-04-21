@@ -10,6 +10,16 @@ const MENTION = '@test_any_the_bot'
 const DOCS_URL = 'https://opensuse.github.io/openSUSE-docs-revamped'
 const COMMAND = '/docs'
 
+const getSetUser = (() => {
+    let user_ids = {}
+    return ({ user_id, user_name = null, results = null }) => {
+        if (!user_ids[user_id]) user_ids[user_id] = { user_name, results }
+        if (results === null) return { results: user_ids[user_id].results, user_name: user_ids[user_id].user_name }
+        user_ids[user_id].results = results
+        user_ids[user_id].user_name = user_name
+    }
+})()
+
 const parsed = s => {
     const head = s.slice(0, 5)
     if (head === COMMAND) return s.slice(6)
@@ -18,10 +28,6 @@ const parsed = s => {
         if (res.length > 0) return res
     }
     return null
-}
-
-const escaped = s => {
-    s.reduce
 }
 
 const bot_handle = (req, res, next) => {
@@ -34,20 +40,29 @@ const bot_handle = (req, res, next) => {
     const message_id = message.message_id
     const message_text = message.text
     const chat_id = message.chat.id
-    // const user_id = message.from.id
-    const username = message.from.username
+    const user_id = message.from.id
+    const user_name = message.from.username
     if (message_text.slice(0, 6) === '/start') {
         const text = 'Search in the docs by simply sending a message following this pattern: \n<search for these words> ' + MENTION + '\nor\n/docs <search for these words>'
         slimbot.sendMessage(chat_id, text)
     }
     const found_in_parse = parsed(message_text)
     if (found_in_parse !== null) {
-        search_handle(found_in_parse).then(found => {
-            const user = username === undefined ? '' : '@' + username + '\n'
-            const text = found !== null
-                ? user + found
-                : 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
-            const optParams = { reply_to_message_id: parseInt(message_id) }
+        search_handle(found_in_parse).then(found_threesomes => {
+            const user = user_name === undefined ? '' : '@' + user_name + '\n'
+            let text;
+            let optParams = { reply_to_message_id: parseInt(message_id) }
+            if (found_threesomes.length === 0) text = 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
+            if (found_threesomes.length === 1) text = user + found_threesomes[0].join('\n')
+            else {
+                getSetUser({ user_id, user_name, results: found_threesomes })
+                text = user + found_threesomes[0].join('\n')
+                optParams.reply_markup = JSON.stringify({
+                    inline_keyboard: [[
+                        { text: 'Next ' + ((found_threesomes.length) - 1).toString(), callback_data: 'nextPage' }
+                    ]]
+                })
+            }
             slimbot.sendMessage(chat_id, text, optParams)
         }).catch(err => console.error(err))
     }
