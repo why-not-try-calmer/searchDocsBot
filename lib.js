@@ -1,8 +1,8 @@
 const lunr = require('lunr')
 const fetch = require('node-fetch')
 
-const DOCS_URL = process.env['DOCS_URL']
-const JSON_BLOB_URL = process.env['JSON_BLOB_URL']
+const DOCS_URL = 'https://opensuse.github.io/openSUSE-docs-revamped'
+const JSON_BLOB_URL = 'https://raw.githubusercontent.com/openSUSE/openSUSE-docs-revamped/gh-pages/search/search_index.json'
 
 const search = (s, blob) => {
     const idx = lunr(function () {
