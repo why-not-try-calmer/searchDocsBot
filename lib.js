@@ -12,7 +12,7 @@ const search = (s, blob) => {
             this.add(doc)
         }, this)
     })
-    return idx.search(s).map(l => '- ' + DOCS_URL + '/' + l.ref)
+    return idx.search(s)//.map(l => '- ' + DOCS_URL + '/' + l.ref)
 }
 
 const getSetBlob = (() => {
@@ -44,6 +44,7 @@ const threesomes = arr => arr.reduce((acc, val, i) => {
 
 const search_handle = search_string => {
     if (!needsARefresh() && (getSetBlob() !== null)) {
+        console.log("Found", found)
         const found = search(search_string, getSetBlob())
         return found.length < 1 ? Promise.resolve(null) : Promise.resolve(threesomes(found[0]))
     }
