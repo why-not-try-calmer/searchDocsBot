@@ -28,20 +28,20 @@ const Users = (() => {
 const query_handler = update => {
     const message_id = update.callback_query.message.message_id
     const [bot_name, chat_id, user_id, qindex] = update.callback_query.data.split(':')
-    
+
     if (bot_name !== 'docs-bot' || bot_name === undefined || chat_id === undefined || user_id === undefined || queried_index === undefined) {
         res.send(200)
         return next()
     }
-    
+
     const current_index = parseInt(qindex)
     const text = Users.get(user_id).partitioned[current_index].join('\n')
-    let payload = [{ text: 'Next ' + (current_index + 1).toString() + '/' + partitioned.length.toString(), callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() }]
+    let payload = [{ text: 'Next ' + (current_index + 1).toString() + '/' + Users.get(user_id).partitioned.length.toString(), callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() }]
     if (current_index > 0) payload.unshift({ text: 'Previous', callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() })
     inline_keyboard = [[payload]]
     let optParams = {}
     optParams.reply_markup = JSON.stringify({ inline_keyboard })
-    
+
     slimbot.editMessageText(chat_id, message_id, text, optParams)
     Users.set(user_id, { current_index: current_index + 1 })
 }
@@ -66,11 +66,13 @@ const bot_handler = (req, res, next) => {
     const chat_id = message.chat.id
     const user_id = message.from.id
     const user_name = message.from.username
+
     // Case '/start' message
     if (message_text.slice(0, 6) === '/start') {
         const text = 'Search in the docs by simply sending a message following this pattern: \n<search for these words> ' + MENTION + '\nor\n/docs <search for these words>'
         slimbot.sendMessage(chat_id, text)
     }
+
     // Case '/docs' message
     const searchwords = parse(message_text)
     if (searchwords !== null) {
