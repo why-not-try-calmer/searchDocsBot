@@ -36,19 +36,35 @@ const search = (s, blob) => {
     return idx.search(s).map(l => '- ' + DOCS_URL + '/' + l.ref)
 }
 
-const search_handle = search_string => {
-    if (!needsARefresh() && (getSetBlob() !== null)) {
-        const found = search(search_string, getSetBlob())
-        return Promise.resolve(found)
-    }
-    return fetch(JSON_BLOB_URL)
-        .then(res => res.json())
-        .then(res => {
-            getSetBlob(res)
+module.exports = {
+    search_handle(search_string) {
+        if (!needsARefresh() && (getSetBlob() !== null)) {
             const found = search(search_string, getSetBlob())
-            return found.length < 1 ? null : found
-        })
-        .catch(e => console.error(e))
+            return Promise.resolve(found)
+        }
+        return fetch(JSON_BLOB_URL)
+            .then(res => res.json())
+            .then(res => {
+                getSetBlob(res)
+                const found = search(search_string, getSetBlob())
+                return found.length < 1 ? null : found
+            })
+            .catch(e => console.error(e))
+    },
+    parse(s) {
+        const head = s.slice(0, 5)
+        if (head === COMMAND) return s.slice(6)
+        if (s.includes(MENTION)) {
+            const res = s.split(MENTION).sort((a, b) => a.length - b.length).pop()
+            if (res.length > 0) return res
+        }
+        return null
+    },
+    partition(arr) {
+        return arr.reduce((acc, val, i) => {
+            if (i === 0 || acc[acc.length - 1].length === 3) return [...acc, [val]]
+            acc[acc.length - 1].push(val)
+            return acc
+        }, [])
+    }
 }
-
-module.exports = search_handle

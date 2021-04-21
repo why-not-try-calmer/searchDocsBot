@@ -1,14 +1,13 @@
+const { partition, parse, search_handle } = require('./lib.js')
 const Slimbot = require('slimbot');
-const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN']);
 const restify = require('restify');
-const search_handle = require('./lib.js')
+
+const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN']);
+const MENTION = process.env['MENTION']
+const DOCS_URL = process.env['DOCS_URL']
 
 let server = restify.createServer();
 server.use(restify.plugins.bodyParser());
-
-const MENTION = process.env['MENTION']
-const DOCS_URL = process.env['DOCS_URL']
-const COMMAND = '/docs'
 
 const Users = (() => {
     let users = {}
@@ -26,29 +25,15 @@ const Users = (() => {
     }
 })()
 
-const parse = s => {
-    const head = s.slice(0, 5)
-    if (head === COMMAND) return s.slice(6)
-    if (s.includes(MENTION)) {
-        const res = s.split(MENTION).sort((a, b) => a.length - b.length).pop()
-        if (res.length > 0) return res
-    }
-    return null
-}
-
-const partition = arr => arr.reduce((acc, val, i) => {
-    if (i === 0 || acc[acc.length - 1].length === 3) return [...acc, [val]]
-    acc[acc.length - 1].push(val)
-    return acc
-}, [])
-
 const query_handler = update => {
     const message_id = update.callback_query.message.message_id
     const [bot_name, chat_id, user_id, qindex] = update.callback_query.data.split(':')
+    
     if (bot_name !== 'docs-bot' || bot_name === undefined || chat_id === undefined || user_id === undefined || queried_index === undefined) {
         res.send(200)
         return next()
     }
+    
     const current_index = parseInt(qindex)
     const text = Users.get(user_id).partitioned[current_index].join('\n')
     let payload = [{ text: 'Next ' + (current_index + 1).toString() + '/' + partitioned.length.toString(), callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() }]
@@ -56,6 +41,7 @@ const query_handler = update => {
     inline_keyboard = [[payload]]
     let optParams = {}
     optParams.reply_markup = JSON.stringify({ inline_keyboard })
+    
     slimbot.editMessageText(chat_id, message_id, text, optParams)
     Users.set(user_id, { current_index: current_index + 1 })
 }
