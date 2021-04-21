@@ -50,6 +50,7 @@ const bot_handler = (req, res, next) => {
     const found_in_parse = parsed(message_text)
     if (found_in_parse !== null) {
         search_handle(found_in_parse).then(found_threesomes => {
+            console.log("main:bot_handler", found_threesomes)
             const user = user_name === undefined ? '' : '@' + user_name + '\n'
             let text;
             let optParams = { reply_to_message_id: parseInt(message_id) }
