@@ -44,8 +44,8 @@ const threesomes = arr => arr.reduce((acc, val, i) => {
 
 const search_handle = search_string => {
     if (!needsARefresh() && (getSetBlob() !== null)) {
-        console.log("Found", found)
         const found = search(search_string, getSetBlob())
+        console.log("Found", found)
         return found.length < 1 ? Promise.resolve(null) : Promise.resolve(threesomes(found[0]))
     }
     return fetch(JSON_BLOB_URL)
