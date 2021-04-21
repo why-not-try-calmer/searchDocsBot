@@ -65,7 +65,6 @@ const bot_handler = (req, res, next) => {
                 return;
             }
             getSetUser({ user_id, user_name, results: found_threesomes })
-            console.log(found_threesomes)
             text = user + found_threesomes[0].join('\n')
             optParams.reply_markup = JSON.stringify({
                 inline_keyboard: [[
