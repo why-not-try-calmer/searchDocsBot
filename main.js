@@ -52,7 +52,7 @@ const bot_handle = (req, res, next) => {
             const user = user_name === undefined ? '' : '@' + user_name + '\n'
             let text;
             let optParams = { reply_to_message_id: parseInt(message_id) }
-            if (found_threesomes.length === 0) text = 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
+            if (found_threesomes === null) text = 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
             if (found_threesomes.length === 1) text = user + found_threesomes[0].join('\n')
             else {
                 getSetUser({ user_id, user_name, results: found_threesomes })
