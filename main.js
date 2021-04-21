@@ -52,17 +52,22 @@ const bot_handle = (req, res, next) => {
             const user = user_name === undefined ? '' : '@' + user_name + '\n'
             let text;
             let optParams = { reply_to_message_id: parseInt(message_id) }
-            if (found_threesomes === null) text = 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
-            if (found_threesomes.length === 1) text = user + found_threesomes[0].join('\n')
-            else {
-                getSetUser({ user_id, user_name, results: found_threesomes })
-                text = user + found_threesomes[0].join('\n')
-                optParams.reply_markup = JSON.stringify({
-                    inline_keyboard: [[
-                        { text: 'Next ' + ((found_threesomes.length) - 1).toString(), callback_data: 'nextPage' }
-                    ]]
-                })
+            if (found_threesomes === null) {
+                text = 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
+                slimbot.sendMessage(chat_id, text, optParams)
+                return;
             }
+            if (found_threesomes.length === 1) {
+                text = user + found_threesomes[0].join('\n')
+                slimbot.sendMessage(chat_id, text, optParams)
+            }
+            getSetUser({ user_id, user_name, results: found_threesomes })
+            text = user + found_threesomes[0].join('\n')
+            optParams.reply_markup = JSON.stringify({
+                inline_keyboard: [[
+                    { text: 'Next ' + ((found_threesomes.length) - 1).toString(), callback_data: 'nextPage' }
+                ]]
+            })
             slimbot.sendMessage(chat_id, text, optParams)
         }).catch(err => console.error(err))
     }
