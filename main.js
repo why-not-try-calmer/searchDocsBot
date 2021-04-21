@@ -1,13 +1,13 @@
 const Slimbot = require('slimbot');
-const slimbot = new Slimbot('1716616291:AAHq1hYejkQt6HFHyw2WzQ3O-xORdYnAvUM');
+const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN']);
 const restify = require('restify');
 const search_handle = require('./lib.js')
 
 let server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 
-const MENTION = '@test_any_the_bot'
-const DOCS_URL = 'https://opensuse.github.io/openSUSE-docs-revamped'
+const MENTION = process.env['MENTION']
+const DOCS_URL = process.env['DOCS_URL']
 const COMMAND = '/docs'
 
 const Users = (() => {
