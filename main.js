@@ -21,7 +21,7 @@ const getSetUser = (() => {
         users[user_id] = Object.assign(users[user_id], update_with)
     }
     return ({ user_id, user_name = null, found = null, current_index = null, message_id = null }) => {
-        if (!user[user_id]) create(user_id)
+        if (!users[user_id]) create(user_id)
         if ([current_index, message_id].any(i => i === null || undefined)) return get(user_id)
         set(user_id, { current_index, message_id, found, user_name: user_name || null })
     }
