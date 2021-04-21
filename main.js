@@ -51,7 +51,8 @@ const bot_handler = (req, res, next) => {
     // Case callback_query update
     if (update.callback_query && update.callback_query.data && update.callback_query.message.message_id) {
         query_handler(update)
-        return;
+        res.send(200)
+        return next()
     }
     // Case 'unhandleable' update
     if (!update.message || !update.message.message_id || !update.message.text || !update.message.chat.id) {
