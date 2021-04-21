@@ -12,13 +12,13 @@ server.use(restify.plugins.bodyParser());
 const Users = (() => {
     let users = {}
     return {
-        init(user_id, message_id, chat_id, partitioned) {
+        i(user_id, message_id, chat_id, partitioned) {
             users[user_id] = { message_id, chat_id, partitioned }
         },
-        get(user_id) {
+        g(user_id) {
             return users[user_id]
         },
-        set(user_id, update_with) {
+        s(user_id, update_with) {
             if (update_with.user_id) delete update_with.user_id
             Object.assign(users[user_id], update_with)
         }
@@ -35,7 +35,7 @@ const query_handler = update => {
     }
 
     const current_index = parseInt(qindex)
-    const text = Users.get(user_id).partitioned[current_index].join('\n')
+    const text = Users.g(user_id).partitioned[current_index].join('\n')
     let payload = [{ text: 'Next ' + (current_index + 1).toString() + '/' + Users.get(user_id).partitioned.length.toString(), callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() }]
     if (current_index > 0) payload.unshift({ text: 'Previous', callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() })
     inline_keyboard = [[payload]]
@@ -43,7 +43,7 @@ const query_handler = update => {
     optParams.reply_markup = JSON.stringify({ inline_keyboard })
 
     slimbot.editMessageText(chat_id, message_id, text, optParams)
-    Users.set(user_id, { current_index: current_index + 1 })
+    Users.s(user_id, { current_index: current_index + 1 })
 }
 
 const bot_handler = (req, res, next) => {
@@ -104,7 +104,7 @@ const bot_handler = (req, res, next) => {
                 ]]
             })
             slimbot.sendMessage(chat_id, text, optParams)
-            Users.init(user_id, message_id, chat_id, partitioned)
+            Users.i(user_id, message_id, chat_id, partitioned)
         }).catch(err => console.error(err))
     }
     res.send(200)
