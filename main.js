@@ -29,7 +29,7 @@ const query_handler = update => {
     const message_id = update.callback_query.message.message_id
     const [bot_name, chat_id, user_id, qindex] = update.callback_query.data.split(':')
 
-    if (bot_name !== 'docs-bot' || bot_name === undefined || chat_id === undefined || user_id === undefined || queried_index === undefined) {
+    if (bot_name !== 'docs-bot' || bot_name === undefined || chat_id === undefined || user_id === undefined || qindex === undefined) {
         res.send(200)
         return next()
     }
