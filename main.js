@@ -68,7 +68,7 @@ const bot_handler = (req, res, next) => {
             text = user + found_threesomes[0].join('\n')
             optParams.reply_markup = JSON.stringify({
                 inline_keyboard: [[
-                    { text: 'Next ' + ((found_threesomes.length) - 1).toString() + '/' + found_threesomes.length.toString(), callback_data: 'nextPage' }
+                    { text: 'Next ' + (1).toString() + '/' + found_threesomes.length.toString(), callback_data: 'nextPage' }
                 ]]
             })
             slimbot.sendMessage(chat_id, text, optParams)
