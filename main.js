@@ -12,11 +12,12 @@ const COMMAND = '/docs'
 
 const getSetUser = (() => {
     let user_ids = {}
-    return ({ user_id, user_name = null, results = null }) => {
+    return ({ user_id, user_name = null, results = null, current_index = null }) => {
         if (!user_ids[user_id]) user_ids[user_id] = { user_name, results }
         if (results === null) return { results: user_ids[user_id].results, user_name: user_ids[user_id].user_name }
         user_ids[user_id].results = results
         user_ids[user_id].user_name = user_name
+        user_ids[user_id].current_index = current_index
     }
 })()
 
@@ -30,7 +31,7 @@ const parsed = s => {
     return null
 }
 
-const bot_handle = (req, res, next) => {
+const bot_handler = (req, res, next) => {
     const update = req.body
     if (!update.message || !update.message.message_id || !update.message.text || !update.message.chat.id) {
         res.send(200)
@@ -66,17 +67,18 @@ const bot_handle = (req, res, next) => {
             text = user + found_threesomes[0].join('\n')
             optParams.reply_markup = JSON.stringify({
                 inline_keyboard: [[
-                    { text: 'Next ' + ((found_threesomes.length) - 1).toString(), callback_data: 'nextPage' }
+                    { text: 'Next ' + ((found_threesomes.length) - 1).toString() + '/' + found_threesomes.length.toString(), callback_data: 'nextPage' }
                 ]]
             })
             slimbot.sendMessage(chat_id, text, optParams)
+            console.log(update)
         }).catch(err => console.error(err))
     }
     res.send(200)
     return next()
 }
 
-const web_handle = (req, res, next) => {
+const web_handler = (req, res, next) => {
     const searchwords = req.params.searchwords
     search_handle(searchwords).then(found => {
         if (found === null) found = 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
@@ -86,6 +88,6 @@ const web_handle = (req, res, next) => {
     return next()
 }
 
-server.post('/bot_updates', bot_handle)
-server.get('/docs/:searchwords', web_handle)
+server.post('/bot_updates', bot_handler)
+server.get('/docs/:searchwords', web_handler)
 server.listen(process.env['PORT'] || 8443);
