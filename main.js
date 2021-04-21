@@ -31,8 +31,15 @@ const parsed = s => {
     return null
 }
 
+const partition = arr => arr.reduce((acc, val, i) => {
+    if (i === 0 || acc[acc.length - 1].length === 3) return [...acc, [val]]
+    acc[acc.length - 1].push(val)
+    return acc
+}, [])
+
 const bot_handler = (req, res, next) => {
     const update = req.body
+    console.log(update)
     if (!update.message || !update.message.message_id || !update.message.text || !update.message.chat.id) {
         res.send(200)
         return next()
@@ -49,30 +56,30 @@ const bot_handler = (req, res, next) => {
     }
     const found_in_parse = parsed(message_text)
     if (found_in_parse !== null) {
-        search_handle(found_in_parse).then(found_threesomes => {
+        search_handle(found_in_parse).then(found => {
             const user = user_name === undefined ? '' : '@' + user_name + '\n'
             let text;
             let optParams = { reply_to_message_id: parseInt(message_id) }
-            if (found_threesomes === null) {
+            if (found === null) {
                 text = 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
                 slimbot.sendMessage(chat_id, text, optParams)
                 return;
             }
-            if (found_threesomes.length === 1) {
-                text = user + found_threesomes[0].join('\n')
+            const partitioned = partition(found)
+            console.log(partitioned)
+            if (partitioned.length === 1) {
+                text = user + partitioned[0].join('\n')
                 slimbot.sendMessage(chat_id, text, optParams)
                 return;
             }
             // getSetUser({ user_id, user_name, results: found_threesomes })
-            console.log(found_threesomes)
-            text = user + found_threesomes.join('\n')
+            text = user + partitioned[0].join('\n')
             optParams.reply_markup = JSON.stringify({
                 inline_keyboard: [[
                     { text: 'Next ' + (1).toString() + '/' + found_threesomes.length.toString(), callback_data: 'nextPage' }
                 ]]
             })
             slimbot.sendMessage(chat_id, text, optParams)
-            console.log(update)
         }).catch(err => console.error(err))
     }
     res.send(200)

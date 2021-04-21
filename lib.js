@@ -36,16 +36,10 @@ const search = (s, blob) => {
     return idx.search(s).map(l => '- ' + DOCS_URL + '/' + l.ref)
 }
 
-const threesomes = arr => arr.reduce((acc, val, i) => {
-    if (i === 0 || acc[acc.length - 1].length === 3) return [...acc, [val]]
-    acc[acc.length - 1].push(val)
-    return acc
-}, [])
-
 const search_handle = search_string => {
     if (!needsARefresh() && (getSetBlob() !== null)) {
         const found = search(search_string, getSetBlob())
-        return found.length < 1 ? Promise.resolve(null) : Promise.resolve(threesomes(found))
+        return found.length < 1 ? Promise.resolve(null) : Promise.resolve(found)
     }
     return fetch(JSON_BLOB_URL)
         .then(res => res.json())
