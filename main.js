@@ -60,6 +60,7 @@ const bot_handle = (req, res, next) => {
             if (found_threesomes.length === 1) {
                 text = user + found_threesomes[0].join('\n')
                 slimbot.sendMessage(chat_id, text, optParams)
+                return;
             }
             getSetUser({ user_id, user_name, results: found_threesomes })
             text = user + found_threesomes[0].join('\n')
