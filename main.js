@@ -73,8 +73,8 @@ const bot_handler = (req, res, next) => {
     }
     // Case '/docs' message
     const searchwords = parse(message_text)
-    if (found_in_parse !== null) {
-        search_handle(found_in_parse).then(found => {
+    if (searchwords !== null) {
+        search_handle(searchwords).then(found => {
             const signature = user_name === undefined ? '' : '@' + user_name + '\n'
             let text;
             let optParams = { reply_to_message_id: parseInt(message_id) }
