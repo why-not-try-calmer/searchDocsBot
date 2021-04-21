@@ -54,7 +54,7 @@ const bot_handler = (req, res, next) => {
         }
         const current_index = parseInt(queried_index)
         const user = getSetUser({ user_id })
-        const text = user.found[queried_index_int].join('\n')
+        const text = user.found[current_index].join('\n')
         let optParams = {}
         optParams.reply_markup = JSON.stringify({
             inline_keyboard: [[
