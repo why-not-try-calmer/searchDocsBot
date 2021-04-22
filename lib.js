@@ -6,7 +6,6 @@ const JSON_BLOB_URL = process.env['JSON_BLOB_URL']
 const MENTION = process.env['MENTION']
 const COMMAND = '/docs'
 
-
 const needsARefresh = (() => {
     const offset = 604800000
     let last_time = new Date().getTime()
