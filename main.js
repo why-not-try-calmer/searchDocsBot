@@ -2,14 +2,13 @@ const { partition, parse, search_handle, Searches } = require('./lib.js')
 const Slimbot = require('slimbot');
 const restify = require('restify');
 
-const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN']) //'1716616291:AAHq1hYejkQt6HFHyw2WzQ3O-xORdYnAvUM'
-const MENTION = process.env['MENTION'] //'@test_any_the_bot' //
-const DOCS_URL = process.env['DOCS_URL'] // 'https://opensuse.github.io/openSUSE-docs-revamped' // 
-
-// slimbot.setWebhook({ url: process.env['BOT_ENDPOINT'] });
+const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN'])
+const MENTION = process.env['MENTION']
+const DOCS_URL = process.env['DOCS_URL'] 
 
 let server = restify.createServer(); 
 server.use(restify.plugins.bodyParser());
+// slimbot.setWebhook({ url: process.env['BOT_ENDPOINT'] });
 
 const buildInlineButton = (text, keywords, index) => {
     return {
@@ -125,19 +124,3 @@ const web_handler = (req, res, next) => {
 server.post('/bot_updates', bot_handler)
 server.get('/docs/:searchwords', web_handler)
 server.listen(process.env['PORT'] || 8443);
-
-/*
-slimbot.on('message', message => {
-    const chat_id = message.chat.id
-    const message_id = message.id
-    const user_name = message.from.user_name
-    const keywords = parse(message.text)
-    if (keywords !== null) {
-        const results = Searches.g(keywords)
-        if (results !== undefined) reply(chat_id, message_id, user_name, keywords, results)
-        else search_handle(keywords).then(found => reply(chat_id, message_id, user_name, keywords, found)).catch(err => console.error(err))
-    }
-})
-
-slimbot.startPolling();
-*/
