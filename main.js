@@ -39,7 +39,7 @@ const query_handler = update => {
     const text = partitioned[current_index].join('\n')
     const payload = []
     if (current_index > 1) payload.push({ text: 'Previous', callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() })
-    payload.push({ text: (current_index + 1).toString() + '/' + partitioned.length.toString() })
+    payload.push({ text: (current_index + 1).toString() + '/' + partitioned.length.toString(), callback_data: '' })
     if (current_index < partitioned.length) payload.push({ text: 'Next', callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() })
     let optParams = {}
     optParams.reply_markup = JSON.stringify({ inline_keyboard: [payload] })
@@ -99,7 +99,7 @@ const bot_handler = (req, res, next) => {
             optParams.reply_markup = JSON.stringify({
                 inline_keyboard: [[
                     {
-                        text: 'Next' + '1/' + partitioned.length.toString(),
+                        text: 'Next ' + '1/' + partitioned.length.toString(),
                         callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + "1"
                     }
                 ]]
