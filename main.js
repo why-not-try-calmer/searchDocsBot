@@ -17,16 +17,16 @@ const buildInlineButton = (text, keywords, index) => {
 }
 
 const query_handler = update => {
-    const message_id = update.callback_query.message.message_id
-    const chat_id = update.callback_query.message.chat.id
     const [bot_name, keywords, qindex] = update.callback_query.data.split(':')
-
     if (bot_name !== 'docs-bot' || bot_name === undefined || keywords === undefined || qindex === undefined) return;
 
+    const message_id = update.callback_query.message.message_id
+    const chat_id = update.callback_query.message.chat.id
     const current_index = parseInt(qindex)
     const partitioned = Searches.g(keywords)
     const text = partitioned[current_index].join('\n')
     const payload = []
+    
     if (current_index > 0) payload.push(buildInlineButton('Previous', keywords, current_index - 1))
     payload.push({ text: (current_index + 1).toString() + '/' + partitioned.length.toString(), callback_data: 'docs-bot:' + keywords + ':' + current_index.toString() })
     if (current_index < partitioned.length + 1) payload.push(buildInlineButton('Next', keywords, current_index + 1))
@@ -35,16 +35,18 @@ const query_handler = update => {
     slimbot.editMessageText(chat_id, message_id, text, optParams)
 }
 
-const reply = (chat_id, message_id, user_name, found) => {
+const reply = (chat_id, message_id, user_name, keywords, found) => {
     signature = user_name === undefined ? '' : '@' + user_name + '\n'
     let text;
     let optParams = { reply_to_message_id: parseInt(message_id) }
+    
     // Nothing found
     if (found.length === 0) {
         text = signature + 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
         slimbot.sendMessage(chat_id, text, optParams)
         return;
     }
+    
     // At least one page, means there is something to cache
     Searches.s(keywords, partitioned)
     const partitioned = partition(found)
@@ -53,6 +55,7 @@ const reply = (chat_id, message_id, user_name, found) => {
         slimbot.sendMessage(chat_id, text, optParams)
         return;
     }
+    
     // More than one page, setting up minimally, sending, and then creating user, saving 'found' 
     text = signature + partitioned[0].join('\n')
     optParams.reply_markup = JSON.stringify({
@@ -68,34 +71,39 @@ const reply = (chat_id, message_id, user_name, found) => {
 
 const bot_handler = (req, res, next) => {
     const update = req.body
+    
     // Case callback_query update
     if (update.callback_query && update.callback_query.data && update.callback_query.message.message_id) {
         query_handler(update)
         res.send(200)
         return next()
     }
+    
     // Case 'unhandleable' update
     if (!update.message || !update.message.message_id || !update.message.text || !update.message.chat.id) {
         res.send(200)
         return next()
     }
+    
     // Case message update
     const message = update.message
     const message_id = message.message_id
     const message_text = message.text
     const chat_id = message.chat.id
     const user_name = message.from.username
+    
     // Case '/start' message
     if (message_text.slice(0, 6) === '/start') {
         const text = 'Search in the docs by simply sending a message following this pattern: \n<search for these words> ' + MENTION + '\nor\n/docs <search for these words>'
         slimbot.sendMessage(chat_id, text)
     }
+    
     // Case '/docs' message
     const keywords = parse(message_text)
     if (keywords !== null) {
         const results = Searches.g(keywords)
-        if (results !== undefined) reply(chat_id, message_id, user_name, results)
-        else search_handle(keywords).then(found => reply(chat_id, message_id, user_name, found)).catch(err => console.error(err))
+        if (results !== undefined) reply(chat_id, message_id, user_name, keywords, results)
+        else search_handle(keywords).then(found => reply(chat_id, message_id, user_name, keywords, found)).catch(err => console.error(err))
     }
     res.send(200)
     return next()
