@@ -49,7 +49,7 @@ module.exports = {
             .then(res => res.json())
             .then(res => {
                 getSetBlob(res)
-                this.Searches.clear()
+                Searches.clear()
                 const found = search(search_string, getSetBlob())
                 return found.length < 1 ? null : found
             })
