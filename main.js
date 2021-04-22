@@ -38,7 +38,7 @@ const query_handler = update => {
     }
 
     const current_index = parseInt(qindex)
-    const partitioned = Searches.g(keywords).partitioned 
+    const partitioned = Searches.g(keywords) 
     const text = partitioned[current_index].join('\n')
     const payload = []
     if (current_index > 1) payload.push({ text: 'Previous', callback_data: 'docs-bot:' + keywords + ':' + (current_index + 1).toString() })
