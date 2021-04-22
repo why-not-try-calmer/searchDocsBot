@@ -48,9 +48,9 @@ const query_handler = update => {
     const partitioned = Searches.g(keywords)
     const text = partitioned[current_index].join('\n')
     const payload = []
-    if (current_index > 1) payload.push(buildInlineButton('Previous', keywords, current_index - 1))
+    if (current_index > 0) payload.push(buildInlineButton('Previous', keywords, current_index - 1))
     payload.push({ text: current_index.toString() + '/' + partitioned.length.toString(), callback_data: 'docs-bot:' + keywords + ':' + current_index.toString() })
-    if (current_index < partitioned.length) payload.push(buildInlineButton('Next', keywords, current_index + 1))
+    if (current_index < partitioned.length + 1) payload.push(buildInlineButton('Next', keywords, current_index + 1))
     let optParams = {}
     optParams.reply_markup = JSON.stringify({ inline_keyboard: [payload] })
     slimbot.editMessageText(chat_id, message_id, text, optParams)
