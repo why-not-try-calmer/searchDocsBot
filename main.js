@@ -10,7 +10,7 @@ let server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 
 const Searches = (() => {
-    let searches = new Map ()
+    let searches = new Map()
     return {
         /*
         i(keywords, partitioned) {
@@ -25,7 +25,14 @@ const Searches = (() => {
             Object.assign(searches[keywords], update_with)*/
         }
     }
-})() 
+})()
+
+const buildInlineButton = (text, keywords, index) => {
+    return {
+        text,
+        callback_data: 'docs-bot:' + keywords + ':' + index.toString()
+    }
+}
 
 const query_handler = update => {
     const message_id = update.callback_query.message.message_id
@@ -38,12 +45,12 @@ const query_handler = update => {
     }
 
     const current_index = parseInt(qindex)
-    const partitioned = Searches.g(keywords) 
+    const partitioned = Searches.g(keywords)
     const text = partitioned[current_index].join('\n')
     const payload = []
-    if (current_index > 1) payload.push({ text: 'Previous', callback_data: 'docs-bot:' + keywords + ':' + (current_index - 1).toString() })
-    payload.push({ text: (current_index + 1).toString() + '/' + partitioned.length.toString(), callback_data: '' })
-    if (current_index < partitioned.length) payload.push({ text: 'Next', callback_data: 'docs-bot:' + keywords + ':' + (current_index + 1).toString() })
+    if (current_index > 1) payload.push(buildInlineButton('Previous', keywords, current_index - 1))
+    payload.push({ text: current_index.toString() + '/' + partitioned.length.toString(), callback_data: 'docs-bot:' + keywords + ':' + current_index.toString() })
+    if (current_index < partitioned.length) payload.push(buildInlineButton('Next', keywords, current_index + 1))
     let optParams = {}
     optParams.reply_markup = JSON.stringify({ inline_keyboard: [payload] })
     slimbot.editMessageText(chat_id, message_id, text, optParams)
