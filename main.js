@@ -18,9 +18,9 @@ const Searches = (() => {
         },*/
         g(keywords) {
             return searches.get(keywords)
-        },
+        },  
         s(keywords, partitioned) {
-            searches.set(keywords, partitioned)
+            if (searches.has(keywords)) searches.set(keywords, partitioned)
             /*if (update_with.messag_ide) delete update_with.message_id
             Object.assign(searches[keywords], update_with)*/
         }
@@ -49,7 +49,7 @@ const query_handler = update => {
     const text = partitioned[current_index].join('\n')
     const payload = []
     if (current_index > 0) payload.push(buildInlineButton('Previous', keywords, current_index - 1))
-    payload.push({ text: current_index.toString() + '/' + partitioned.length.toString(), callback_data: 'docs-bot:' + keywords + ':' + current_index.toString() })
+    payload.push({ text: (current_index + 1).toString() + '/' + partitioned.length.toString(), callback_data: 'docs-bot:' + keywords + ':' + current_index.toString() })
     if (current_index < partitioned.length + 1) payload.push(buildInlineButton('Next', keywords, current_index + 1))
     let optParams = {}
     optParams.reply_markup = JSON.stringify({ inline_keyboard: [payload] })
