@@ -48,8 +48,8 @@ const reply = (chat_id, message_id, user_name, keywords, found) => {
     }
     
     // At least one page, means there is something to cache
-    Searches.s(keywords, partitioned)
     const partitioned = partition(found)
+    Searches.s(keywords, partitioned)
     if (partitioned.length === 1) {
         text = signature + partitioned[0].join('\n')
         slimbot.sendMessage(chat_id, text, optParams)
