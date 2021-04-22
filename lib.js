@@ -6,17 +6,6 @@ const JSON_BLOB_URL = process.env['JSON_BLOB_URL']
 const MENTION = process.env['MENTION']
 const COMMAND = '/docs'
 
-const search = (s, blob) => {
-    const idx = lunr(function () {
-        this.ref('location')
-        this.field('text')
-        blob.docs.forEach(function (doc) {
-            this.add(doc)
-        }, this)
-    })
-    return idx.search(s).map(l => '- ' + DOCS_URL + '/' + l.ref)
-}
-
 module.exports = {
     Searches: (function () {
         const searches = new Map()
@@ -38,13 +27,21 @@ module.exports = {
                 blob = fresh_blob
                 searches.forEach((_, k) => searches.set(k, search(k, blob)))
             },
-            blob() { return blob; }
+            search(s){
+                const idx = lunr(function () {
+                    this.ref('location')
+                    this.field('text')
+                    blob.docs.forEach(function (doc) {
+                        this.add(doc)
+                    }, this)
+                })
+                return idx.search(s).map(l => '- ' + DOCS_URL + '/' + l.ref)
+            }
         }
     })(),
     search_handle(search_string) {
         if (!module.exports.Searches.needs_refresh()) {
-            const blob = module.exports.Searches.blob()
-            const found = search(search_string, blob)
+            const found = module.exports.Searches.search(search_string)
             return Promise.resolve(found)
         }
         return fetch(JSON_BLOB_URL)
@@ -52,7 +49,7 @@ module.exports = {
             .then(blob => {
                 // Refreshing cache
                 module.exports.Searches.refresh(blob)
-                const found = search(search_string, blob)
+                const found = module.exports.Searches.search(search_string)
                 return found.length < 1 ? null : found
             })
             .catch(e => console.error(e))
