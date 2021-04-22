@@ -37,12 +37,14 @@ module.exports = {
             refresh(fresh_blob) {
                 blob = fresh_blob
                 searches.forEach((_, k) => searches.set(k, search(k, blob)))
-            }
+            },
+            blob() { return blob; }
         }
     })(),
     search_handle(search_string) {
         if (!module.exports.Searches.needs_refresh()) {
-            const found = search(search_string, getSetBlob())
+            const blob = module.exports.Searches.blob()
+            const found = search(search_string, blob)
             return Promise.resolve(found)
         }
         return fetch(JSON_BLOB_URL)
