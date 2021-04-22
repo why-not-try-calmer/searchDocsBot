@@ -12,7 +12,7 @@ server.use(restify.plugins.bodyParser());
 
 const buildInlineButton = (text, keywords, index) => {
     return {
-        text,
+        text, 
         callback_data: 'docs-bot:' + keywords + ':' + index.toString()
     }
 }
