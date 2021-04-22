@@ -6,7 +6,7 @@ const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN']);
 const MENTION = process.env['MENTION']
 const DOCS_URL = process.env['DOCS_URL']
 
-let server = restify.createServer();
+let server = restify.createServer(); 
 server.use(restify.plugins.bodyParser());
 
 const buildInlineButton = (text, keywords, index) => {
