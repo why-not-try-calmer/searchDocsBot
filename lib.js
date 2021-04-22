@@ -16,6 +16,7 @@ module.exports = {
             g(keywords) { return searches.get(keywords) },
             s(keywords, partitioned) { if (!searches.has(keywords)) searches.set(keywords, partitioned) },
             needs_refresh() {
+                if (Object.keys(blob).length === 0) return true
                 const now = new Date().getTime()
                 if ((now - last_time) > offset) {
                     last_time = now
