@@ -9,42 +9,45 @@ const DOCS_URL = process.env['DOCS_URL']
 let server = restify.createServer();
 server.use(restify.plugins.bodyParser());
 
-const Users = (() => {
-    let users = {}
+const Searches = (() => {
+    let searches = new Map ()
     return {
-        i(user_id, message_id, chat_id, partitioned) {
-            users[user_id] = { message_id, chat_id, partitioned }
+        /*
+        i(keywords, partitioned) {
+            searches.set(keywords, partitioned)
+        },*/
+        g(keywords) {
+            return searches.get(keywords)
         },
-        g(user_id) {
-            return users[user_id]
-        },
-        s(user_id, update_with) {
-            if (update_with.user_id) delete update_with.user_id
-            Object.assign(users[user_id], update_with)
+        s(keywords, update_with) {
+            searches.set(keywords, partitioned)
+            /*if (update_with.messag_ide) delete update_with.message_id
+            Object.assign(searches[keywords], update_with)*/
         }
     }
 })()
 
 const query_handler = update => {
     const message_id = update.callback_query.message.message_id
-    const [bot_name, chat_id, user_id, qindex] = update.callback_query.data.split(':')
+    const chat_id = update.callback_query.message.chat.id
+    const [bot_name, keywords, qindex] = update.callback_query.data.split(':')
 
-    if (bot_name !== 'docs-bot' || bot_name === undefined || chat_id === undefined || user_id === undefined || qindex === undefined) {
+    if (bot_name !== 'docs-bot' || bot_name === undefined || keywords === undefined || qindex === undefined) {
         res.send(200)
         return next()
     }
 
     const current_index = parseInt(qindex)
-    const partitioned = Users.g(user_id).partitioned 
+    const partitioned = Searches.g(keywords).partitioned 
     const text = partitioned[current_index].join('\n')
     const payload = []
-    if (current_index > 1) payload.push({ text: 'Previous', callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() })
+    if (current_index > 1) payload.push({ text: 'Previous', callback_data: 'docs-bot:' + keywords + ':' + (current_index + 1).toString() })
     payload.push({ text: (current_index + 1).toString() + '/' + partitioned.length.toString(), callback_data: '' })
-    if (current_index < partitioned.length) payload.push({ text: 'Next', callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() })
+    if (current_index < partitioned.length) payload.push({ text: 'Next', callback_data: 'docs-bot:' + keywords + ':' + (current_index + 1).toString() })
     let optParams = {}
     optParams.reply_markup = JSON.stringify({ inline_keyboard: [payload] })
     slimbot.editMessageText(chat_id, message_id, text, optParams)
-    Users.s(user_id, { current_index: current_index + 1 })
+    Searches.s(keywords, { current_index: current_index + 1 })
 }
 
 const bot_handler = (req, res, next) => {
@@ -75,9 +78,9 @@ const bot_handler = (req, res, next) => {
     }
 
     // Case '/docs' message
-    const searchwords = parse(message_text)
-    if (searchwords !== null) {
-        search_handle(searchwords).then(found => {
+    const keywords = parse(message_text)
+    if (keywords !== null) {
+        search_handle(keywords).then(found => {
             const signature = user_name === undefined ? '' : '@' + user_name + '\n'
             let text;
             let optParams = { reply_to_message_id: parseInt(message_id) }
@@ -100,12 +103,12 @@ const bot_handler = (req, res, next) => {
                 inline_keyboard: [[
                     {
                         text: 'Next ' + '1/' + partitioned.length.toString(),
-                        callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + "1"
+                        callback_data: 'docs-bot:' + keywords + ':' + "1"
                     }
                 ]]
             })
             slimbot.sendMessage(chat_id, text, optParams)
-            Users.i(user_id, message_id, chat_id, partitioned)
+            Searches.s(keywords, partitioned)
         }).catch(err => console.error(err))
     }
     res.send(200)
