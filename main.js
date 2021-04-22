@@ -2,9 +2,9 @@ const { partition, parse, search_handle, Searches } = require('./lib.js')
 const Slimbot = require('slimbot');
 const restify = require('restify');
 
-const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN']);
-const MENTION = process.env['MENTION']
-const DOCS_URL = process.env['DOCS_URL']
+const slimbot = new Slimbot('1716616291:AAHq1hYejkQt6HFHyw2WzQ3O-xORdYnAvUM')//process.env['TELEGRAM_TOKEN']);
+const MENTION = '@test_any_the_bot' //process.env['MENTION']
+const DOCS_URL = 'https://opensuse.github.io/openSUSE-docs-revamped' // process.env['DOCS_URL']
 
 let server = restify.createServer(); 
 server.use(restify.plugins.bodyParser());
@@ -123,3 +123,4 @@ const web_handler = (req, res, next) => {
 server.post('/bot_updates', bot_handler)
 server.get('/docs/:searchwords', web_handler)
 server.listen(process.env['PORT'] || 8443);
+
