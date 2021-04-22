@@ -25,7 +25,7 @@ const Searches = (() => {
             Object.assign(searches[keywords], update_with)*/
         }
     }
-})()
+})() 
 
 const query_handler = update => {
     const message_id = update.callback_query.message.message_id
