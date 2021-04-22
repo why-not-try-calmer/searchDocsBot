@@ -20,7 +20,7 @@ const Searches = (() => {
             return searches.get(keywords)
         },  
         s(keywords, partitioned) {
-            if (searches.has(keywords)) searches.set(keywords, partitioned)
+            if (!searches.has(keywords)) searches.set(keywords, partitioned)
             /*if (update_with.messag_ide) delete update_with.message_id
             Object.assign(searches[keywords], update_with)*/
         }
