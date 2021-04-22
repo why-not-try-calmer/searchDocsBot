@@ -49,6 +49,7 @@ module.exports = {
             .then(res => res.json())
             .then(res => {
                 getSetBlob(res)
+                this.Searches.clear()
                 const found = search(search_string, getSetBlob())
                 return found.length < 1 ? null : found
             })
@@ -69,5 +70,25 @@ module.exports = {
             acc[acc.length - 1].push(val)
             return acc
         }, [])
-    }
+    },
+    Searches: (function () {
+        let searches = new Map()
+        return {
+            /*
+            i(keywords, partitioned) {
+                searches.set(keywords, partitioned)
+            },*/
+            g(keywords) {
+                return searches.get(keywords)
+            },
+            s(keywords, partitioned) {
+                if (!searches.has(keywords)) searches.set(keywords, partitioned)
+                /*if (update_with.messag_ide) delete update_with.message_id
+                Object.assign(searches[keywords], update_with)*/
+            },
+            clear() {
+                searches.clear()
+            }
+        }
+    })()
 }

@@ -1,4 +1,4 @@
-const { partition, parse, search_handle } = require('./lib.js')
+const { partition, parse, search_handle, Searches } = require('./lib.js')
 const Slimbot = require('slimbot');
 const restify = require('restify');
 
@@ -8,24 +8,6 @@ const DOCS_URL = process.env['DOCS_URL']
 
 let server = restify.createServer();
 server.use(restify.plugins.bodyParser());
-
-const Searches = (() => {
-    let searches = new Map()
-    return {
-        /*
-        i(keywords, partitioned) {
-            searches.set(keywords, partitioned)
-        },*/
-        g(keywords) {
-            return searches.get(keywords)
-        },  
-        s(keywords, partitioned) {
-            if (!searches.has(keywords)) searches.set(keywords, partitioned)
-            /*if (update_with.messag_ide) delete update_with.message_id
-            Object.assign(searches[keywords], update_with)*/
-        }
-    }
-})()
 
 const buildInlineButton = (text, keywords, index) => {
     return {
@@ -39,10 +21,7 @@ const query_handler = update => {
     const chat_id = update.callback_query.message.chat.id
     const [bot_name, keywords, qindex] = update.callback_query.data.split(':')
 
-    if (bot_name !== 'docs-bot' || bot_name === undefined || keywords === undefined || qindex === undefined) {
-        res.send(200)
-        return next()
-    }
+    if (bot_name !== 'docs-bot' || bot_name === undefined || keywords === undefined || qindex === undefined) return;
 
     const current_index = parseInt(qindex)
     const partitioned = Searches.g(keywords)
@@ -54,6 +33,37 @@ const query_handler = update => {
     let optParams = {}
     optParams.reply_markup = JSON.stringify({ inline_keyboard: [payload] })
     slimbot.editMessageText(chat_id, message_id, text, optParams)
+}
+
+const reply = (chat_id, message_id, user_name, found) => {
+    signature = user_name === undefined ? '' : '@' + user_name + '\n'
+    let text;
+    let optParams = { reply_to_message_id: parseInt(message_id) }
+    // Nothing found
+    if (found.length === 0) {
+        text = signature + 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
+        slimbot.sendMessage(chat_id, text, optParams)
+        return;
+    }
+    // At least one page, means there is something to cache
+    Searches.s(keywords, partitioned)
+    const partitioned = partition(found)
+    if (partitioned.length === 1) {
+        text = signature + partitioned[0].join('\n')
+        slimbot.sendMessage(chat_id, text, optParams)
+        return;
+    }
+    // More than one page, setting up minimally, sending, and then creating user, saving 'found' 
+    text = signature + partitioned[0].join('\n')
+    optParams.reply_markup = JSON.stringify({
+        inline_keyboard: [[
+            {
+                text: 'Next ' + '1/' + partitioned.length.toString(),
+                callback_data: 'docs-bot:' + keywords + ':' + "1"
+            }
+        ]]
+    })
+    slimbot.sendMessage(chat_id, text, optParams)
 }
 
 const bot_handler = (req, res, next) => {
@@ -74,48 +84,18 @@ const bot_handler = (req, res, next) => {
     const message_id = message.message_id
     const message_text = message.text
     const chat_id = message.chat.id
-    const user_id = message.from.id
     const user_name = message.from.username
-
     // Case '/start' message
     if (message_text.slice(0, 6) === '/start') {
         const text = 'Search in the docs by simply sending a message following this pattern: \n<search for these words> ' + MENTION + '\nor\n/docs <search for these words>'
         slimbot.sendMessage(chat_id, text)
     }
-
     // Case '/docs' message
     const keywords = parse(message_text)
     if (keywords !== null) {
-        search_handle(keywords).then(found => {
-            const signature = user_name === undefined ? '' : '@' + user_name + '\n'
-            let text;
-            let optParams = { reply_to_message_id: parseInt(message_id) }
-            // No result, nothing to store
-            if (found.length === 0) {
-                text = 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
-                slimbot.sendMessage(chat_id, text, optParams)
-                return;
-            }
-            // Only one page, nothing to store either
-            const partitioned = partition(found)
-            if (partitioned.length === 1) {
-                text = signature + partitioned[0].join('\n')
-                slimbot.sendMessage(chat_id, text, optParams)
-                return;
-            }
-            // More than one page, setting up minimally, sending, and then creating user, saving 'found' 
-            text = signature + partitioned[0].join('\n')
-            optParams.reply_markup = JSON.stringify({
-                inline_keyboard: [[
-                    {
-                        text: 'Next ' + '1/' + partitioned.length.toString(),
-                        callback_data: 'docs-bot:' + keywords + ':' + "1"
-                    }
-                ]]
-            })
-            slimbot.sendMessage(chat_id, text, optParams)
-            Searches.s(keywords, partitioned)
-        }).catch(err => console.error(err))
+        const results = Searches.g(keywords)
+        if (results !== undefined) reply(chat_id, message_id, user_name, results)
+        else search_handle(keywords).then(found => reply(chat_id, message_id, user_name, found)).catch(err => console.error(err))
     }
     res.send(200)
     return next()
