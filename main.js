@@ -41,7 +41,6 @@ const query_handler = update => {
     if (current_index > 1) payload.push({ text: 'Previous', callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() })
     payload.push({ text: (current_index + 1).toString() + '/' + partitioned.length.toString() })
     if (current_index < partitioned.length) payload.push({ text: 'Next', callback_data: 'docs-bot:' + chat_id + ':' + user_id + ':' + (current_index + 1).toString() })
-    if (current_index > 0) 
     let optParams = {}
     optParams.reply_markup = JSON.stringify({ inline_keyboard: [payload] })
     slimbot.editMessageText(chat_id, message_id, text, optParams)
