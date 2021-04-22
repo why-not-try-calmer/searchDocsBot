@@ -41,13 +41,12 @@ const query_handler = update => {
     const partitioned = Searches.g(keywords) 
     const text = partitioned[current_index].join('\n')
     const payload = []
-    if (current_index > 1) payload.push({ text: 'Previous', callback_data: 'docs-bot:' + keywords + ':' + (current_index + 1).toString() })
+    if (current_index > 1) payload.push({ text: 'Previous', callback_data: 'docs-bot:' + keywords + ':' + (current_index - 1).toString() })
     payload.push({ text: (current_index + 1).toString() + '/' + partitioned.length.toString(), callback_data: '' })
     if (current_index < partitioned.length) payload.push({ text: 'Next', callback_data: 'docs-bot:' + keywords + ':' + (current_index + 1).toString() })
     let optParams = {}
     optParams.reply_markup = JSON.stringify({ inline_keyboard: [payload] })
     slimbot.editMessageText(chat_id, message_id, text, optParams)
-    Searches.s(keywords, { current_index: current_index + 1 })
 }
 
 const bot_handler = (req, res, next) => {
