@@ -6,27 +6,6 @@ const JSON_BLOB_URL = process.env['JSON_BLOB_URL']
 const MENTION = process.env['MENTION']
 const COMMAND = '/docs'
 
-const needsARefresh = (() => {
-    const offset = 604800000
-    let last_time = new Date().getTime()
-    return () => {
-        const now = new Date().getTime()
-        if ((now - last_time) > offset) {
-            last_time = now
-            return true
-        }
-        return false
-    }
-})()
-
-const getSetBlob = (() => {
-    let _b = null
-    return (b = null) => {
-        if (b === null) return _b
-        _b = b
-    }
-})()
-
 const search = (s, blob) => {
     const idx = lunr(function () {
         this.ref('location')
@@ -40,36 +19,38 @@ const search = (s, blob) => {
 
 module.exports = {
     Searches: (function () {
-        let searches = new Map()
+        const searches = new Map()
+        const offset = 604800000
+        let blob = {}
+        let last_time = new Date().getTime()
         return {
-            /*
-            i(keywords, partitioned) {
-                searches.set(keywords, partitioned)
-            },*/
-            g(keywords) {
-                return searches.get(keywords)
+            g(keywords) { return searches.get(keywords) },
+            s(keywords, partitioned) { if (!searches.has(keywords)) searches.set(keywords, partitioned) },
+            needs_refresh() {
+                const now = new Date().getTime()
+                if ((now - last_time) > offset) {
+                    last_time = now
+                    return true
+                }
+                return false
             },
-            s(keywords, partitioned) {
-                if (!searches.has(keywords)) searches.set(keywords, partitioned)
-                /*if (update_with.messag_ide) delete update_with.message_id
-                Object.assign(searches[keywords], update_with)*/
-            },
-            clear() {
-                searches.clear()
+            refresh(fresh_blob) {
+                blob = fresh_blob
+                searches.forEach((_, k) => searches.set(k, search(k, blob)))
             }
         }
     })(),
     search_handle(search_string) {
-        if (!needsARefresh() && (getSetBlob() !== null)) {
+        if (!module.exports.Searches.needs_refresh()) {
             const found = search(search_string, getSetBlob())
             return Promise.resolve(found)
         }
         return fetch(JSON_BLOB_URL)
             .then(res => res.json())
-            .then(res => {
-                getSetBlob(res)
-                module.exports.Searches.clear()
-                const found = search(search_string, getSetBlob())
+            .then(blob => {
+                // Refreshing cache
+                module.exports.Searches.refresh(blob)
+                const found = search(search_string, blob)
                 return found.length < 1 ? null : found
             })
             .catch(e => console.error(e))
