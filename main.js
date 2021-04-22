@@ -6,7 +6,7 @@ const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN']) //'1716616291:AAHq1hY
 const MENTION = process.env['MENTION'] //'@test_any_the_bot' //
 const DOCS_URL = process.env['DOCS_URL'] // 'https://opensuse.github.io/openSUSE-docs-revamped' // 
 
-slimbot.setWebhook({ url: process.en['BOT_ENDPOINT'] });
+slimbot.setWebhook({ url: process.env['BOT_ENDPOINT'] });
 let server = restify.createServer(); 
 server.use(restify.plugins.bodyParser());
 
