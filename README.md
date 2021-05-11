@@ -1,7 +1,17 @@
-## Events triggering logging
-* `/dump` with a correct password (no flush)
-* `/wakeup`, only if `Searches.refreshNeeded()` found `true`, and then logging will also flush the memory
-### How to log
-1. Query a couple of keywords with the bot
-2. GET at `/dump/:secret`
-3. GET at `/stats`
+## How to use
+### Telegram
+Search the docs by simply sending a message following this pattern: 
+
+`<search for these words> @openSUSE_docs_bot`
+
+or 
+
+`/docs <search for these words>`
+
+Use `/stats` to get some use statistics, and `/start` to bring up this very message.
+
+### Web
+A GET endpoint can be reached at: https://opensuse-docs-bot.herokuapp.com/stats
+
+### Contribute
+Wanna help me maintain this or even take over maintainance? nycticorax@opensuse.org. You can also reach out on Telegram. You can find my identifier if you check out the bot's info on Telegram, https://t.me/openSUSE_docs_bot.
