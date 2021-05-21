@@ -28,7 +28,7 @@ const promoOptParams = {
         ], [
             {
                 text: 'Visit our GitHub',
-                url: 'https://github.com/openSUSE/openSUSE-docs-revamped'
+                url: 'https://github.com/openSUSE/openSUSE-docs-revamped-temp'
             }
         ]]
     })
