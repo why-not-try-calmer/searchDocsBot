@@ -179,15 +179,15 @@ server.get('/wakeup', (_, res, next) => {
     return next(false)
 })
 
-server.get('/search', (req, res, next) => {
-    const parsed = parse(req.body.search)
+server.get('/search/:keywords', (req, res, next) => {
+    const parsed = parse(req.params.keywords)
     if (parsed.Err) {
         res.json("Couldn't parse your input: " + parsed.Err)
         return next(false)
     }
     if (parsed.Ok === 'search') {
         const found = Searches.g(parsed.args)
-        if (found.length === 0) { res.json('No result for this query string: ' + req.body.search); return next(false) }
+        if (found.length === 0) { res.json('No result for this query string: ' + req.params.keywords); return next(false) }
         res.json(found[0].join('\n'))
         return next(false)
     }
