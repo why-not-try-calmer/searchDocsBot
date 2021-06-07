@@ -180,8 +180,7 @@ server.get('/wakeup', (_, res, next) => {
 })
 
 server.get('/search/:keywords', (req, res, next) => {
-    console.log(req.params)
-    const parsed = parse(req.params.keywords)
+    const parsed = parse('/docs ' + req.params.keywords)
     if (parsed.Err) {
         res.json("Couldn't parse your input: " + parsed.Err)
         return next(false)
