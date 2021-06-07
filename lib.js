@@ -29,7 +29,7 @@ function parse(s) {
         Ok: 'start'
     }
     if (cmd.indexOf('stats') > -1) return {
-        Ok:'stats'
+        Ok: 'stats'
     }
     args = args.join(' ')
     if (args.trim().length < 3) return {
