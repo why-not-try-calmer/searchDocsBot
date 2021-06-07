@@ -188,7 +188,7 @@ server.get('/search/:keywords', (req, res, next) => {
     if (parsed.Ok === 'search') {
         const found = Searches.g(parsed.args)
         if (found.length === 0) { res.json('No result for this query string: ' + req.params.keywords); return next(false) }
-        res.json(found[0].join('\n'))
+        res.json(found[0])
         return next(false)
     }
 })
