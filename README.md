@@ -11,7 +11,11 @@ or
 Use `/stats` to get some use statistics, and `/start` to bring up this very message.
 
 ### Web
-A GET endpoint can be reached at: https://opensuse-docs-bot.herokuapp.com/stats.
+GET endpoints can be reached at: 
+- `https://opensuse-docs-bot.herokuapp.com/search/<your keywords>` for searching the docs; and
+- `https://opensuse-docs-bot.herokuapp.com/stats` for getting statistics about usage on Telegram, [go there now](https://opensuse-docs-bot.herokuapp.com/stats).
+
+Please note that querying the docs from the web does not log any stats.
 
 ### Changelog
 On Telegram, at https://t.me/openSUSE_docs_bot_changelog.
