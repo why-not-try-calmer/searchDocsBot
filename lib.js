@@ -12,7 +12,7 @@ const PARSE_ERRORS = {
     OS_MISPELLED: "Please, try to be mindful of the good people who fought hard to come up with a good name. It's spelled `openSUSE`. Not "
 }
 
-const mispelled = args => args.find(s => s.toLowerCase() === "opensuse" && s !== "openSUSE")
+const mispelled = args => args.find(s => s.toLowerCase() === 'opensuse' && s !== 'openSUSE')
 
 function parse(s) {
     const splitted = s.split(' ')
@@ -36,7 +36,7 @@ function parse(s) {
     })
     let mis = mispelled(args)
     if (mis) return {
-        Err: PARSE_ERRORS['OS_MISPELLED'] + "`" + mis + "`"
+        Err: PARSE_ERRORS['OS_MISPELLED'] + '`' + mis + '`.'
     }
     if (!cmd) return null
     if (cmd.indexOf('start') > -1) return {

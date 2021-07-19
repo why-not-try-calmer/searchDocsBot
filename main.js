@@ -34,6 +34,8 @@ const promoOptParams = {
     })
 }
 
+const getSignature = user_name => user_name === undefined ? '' : '@' + user_name + '\n'
+
 const renderStats = () => Searches.unstoreKeywordsChats().then(docs => {
     const [per_chat, sums] = docs
     const allStatsMsg = '\nBetween all chats using this bot, top 15 most searched keywords:\n' + sums.map(d => '- ' + d.keyword + ': ' + d.counter).join('\n')
@@ -76,7 +78,7 @@ const query_handler = update => {
 
 const reply = (chat_id, user_name, keywords, optParams) => {
     const found = Searches.g(keywords)
-    const signature = user_name === undefined ? '' : '@' + user_name + '\n'
+    const signature = getSignature(user_name)
     let text;
 
     if (found.length === 0) {
@@ -134,7 +136,7 @@ const bot_handler = (req, res, next) => {
 
     // ... erroneous input
     if (parsed.Err) {
-        slimbot.sendMessage(chat_id, parsed.Err)
+        slimbot.sendMessage(chat_id, getSignature(user_name) + parsed.Err)
         res.send(200)
         return next(false)
     }
