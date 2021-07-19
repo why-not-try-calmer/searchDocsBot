@@ -7,11 +7,19 @@ const JSON_BLOB_URL = process.env['JSON_BLOB_URL']
 const DAILY_OFFSET = 43200000
 const PAGES_UPPER_BOUND = 3
 const COMMAND_WORDS = ['/start', '/start@openSUSE_docs_bot', '/docs', '/docs@opensSUSE_docs_bot', '@openSUSE_docs_bot', '/stats', '/stats@openSUSE_docs_bot']
-const PARSE_ERRORS = { TOO_SHORT: 'Keywords must be at least 3-character long.' }
+const PARSE_ERRORS = {
+    TOO_SHORT: 'Keywords must be at least 3-character long.',
+    OS_MISPELLED: "Please, try to be mindful of the good people who fought hard to come up with a good name. It's spelled `openSUSE`. Not "
+}
+
+const mispelled = args => args.find(s => s.toLowerCase() === "opensuse" && s !== "openSUSE")
 
 function parse(s) {
     const splitted = s.split(' ')
-    let { cmd, args } = splitted.reduce((acc, val) => {
+    let {
+        cmd,
+        args
+    } = splitted.reduce((acc, val) => {
         if (acc.cmd) {
             acc.args.push(val);
             return acc
@@ -22,8 +30,14 @@ function parse(s) {
         }
         acc.args.push(val)
         return acc
-    }, { cmd: null, args: [] }
-    )
+    }, {
+        cmd: null,
+        args: []
+    })
+    let mis = mispelled(args)
+    if (mis) return {
+        Err: PARSE_ERRORS['OS_MISPELLED'] + "`" + mis + "`"
+    }
     if (!cmd) return null
     if (cmd.indexOf('start') > -1) return {
         Ok: 'start'
