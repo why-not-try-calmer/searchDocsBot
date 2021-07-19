@@ -36,7 +36,7 @@ function parse(s) {
     })
     let mis = mispelled(args)
     if (mis) return {
-        Err: PARSE_ERRORS['OS_MISPELLED'] + '`' + mis + '`.'
+        Err: PARSE_ERRORS['OS_MISPELLED'] + '`' + mis + '`. You can use `oS` if you prefer :)'
     }
     if (!cmd) return null
     if (cmd.indexOf('start') > -1) return {
