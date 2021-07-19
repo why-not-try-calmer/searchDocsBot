@@ -134,20 +134,20 @@ const bot_handler = (req, res, next) => {
     const user_name = message.from.username
     let text;
 
-    // ... erroneous input
-    if (parsed.Err) {
-        slimbot.sendMessage(chat_id, getSignature(user_name) + parsed.Err)
-        res.send(200)
-        return next(false)
-    }
-
     const message_id = message.message_id
     const optParams = { reply_to_message_id: parseInt(message_id) }
 
+    // ... erroneous input
+    if (parsed.Err) {
+        optParams.parse_mode = 'Markdown'
+        slimbot.sendMessage(chat_id, getSignature(user_name) + parsed.Err, optParams)
+        res.send(200)
+        return next(false)
+    }
+    
     //  ...'/start' message
     if (parsed.Ok === 'start') {
         text = 'Search the docs by simply sending a message following this pattern: \n<search for these words> @openSUSE_docs_bot \nor\n/docs <search for these words>. Use /stats to get some use statistics, and /help to bring up this very message.'
-        optParams.parse_mode = 'Markdown'
         slimbot.sendMessage(chat_id, text, optParams)
         res.send(200)
         return next(false)

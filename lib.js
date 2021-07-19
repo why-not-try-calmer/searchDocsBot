@@ -9,7 +9,7 @@ const PAGES_UPPER_BOUND = 3
 const COMMAND_WORDS = ['/start', '/start@openSUSE_docs_bot', '/docs', '/docs@opensSUSE_docs_bot', '@openSUSE_docs_bot', '/stats', '/stats@openSUSE_docs_bot']
 const PARSE_ERRORS = {
     TOO_SHORT: 'Keywords must be at least 3-character long.',
-    OS_MISPELLED: "Please, try to be mindful of the good people who fought hard to come up with a good name. It's spelled `openSUSE`. Not "
+    OS_MISPELLED: "Please, be mindful of the good people who gave their life for the name `openSUSE`, which instead you spelled as "
 }
 
 const mispelled = args => args.find(s => s.toLowerCase() === 'opensuse' && s !== 'openSUSE')
