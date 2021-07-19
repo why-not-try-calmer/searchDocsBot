@@ -140,7 +140,7 @@ const bot_handler = (req, res, next) => {
     // ... erroneous input
     if (parsed.Err) {
         optParams.parse_mode = 'Markdown'
-        slimbot.sendMessage(chat_id, getSignature(user_name) + parsed.Err, optParams)
+        slimbot.sendMessage(chat_id, parsed.Err, optParams)
         res.send(200)
         return next(false)
     }
