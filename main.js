@@ -34,8 +34,6 @@ const promoOptParams = {
     })
 }
 
-const getSignature = user_name => user_name === undefined ? '' : '@' + user_name + '\n'
-
 const renderStats = () => Searches.unstoreKeywordsChats().then(docs => {
     const [per_chat, sums] = docs
     const allStatsMsg = '\nBetween all chats using this bot, top 15 most searched keywords:\n' + sums.map(d => '- ' + d.keyword + ': ' + d.counter).join('\n')
@@ -76,18 +74,17 @@ const query_handler = update => {
     slimbot.editMessageText(chat_id, message_id, text, optParams)
 }
 
-const reply = (chat_id, user_name, keywords, optParams) => {
+const reply = (chat_id, keywords, optParams) => {
     const found = Searches.g(keywords)
-    const signature = getSignature(user_name)
     let text;
 
     if (found.length === 0) {
-        text = signature + 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
+        text = 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
         slimbot.sendMessage(chat_id, text, optParams)
         return Promise.resolve()
     }
 
-    text = signature + found[0].join('\n')
+    text = found[0].join('\n')
 
     if (found.length === 1) {
         slimbot.sendMessage(chat_id, text, optParams)
@@ -131,7 +128,6 @@ const bot_handler = (req, res, next) => {
     if (!parsed) { res.send(200); return next(false) }
 
     const chat_id = message.chat.id
-    const user_name = message.from.username
     let text;
 
     const message_id = message.message_id
@@ -154,7 +150,7 @@ const bot_handler = (req, res, next) => {
     }
 
     // ... '/docs' message
-    if (parsed.Ok === 'search') return reply(chat_id, user_name, parsed.args, optParams)
+    if (parsed.Ok === 'search') return reply(chat_id, parsed.args, optParams)
         .catch(err => console.error('main:reply: ', err))
         .finally(() => { res.send(200); return next(false) })
 
