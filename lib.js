@@ -9,7 +9,7 @@ const PAGES_UPPER_BOUND = 3
 const COMMAND_WORDS = ['/start', '/start@openSUSE_docs_bot', '/docs', '/docs@opensSUSE_docs_bot', '@openSUSE_docs_bot', '/stats', '/stats@openSUSE_docs_bot']
 const PARSE_ERRORS = {
     TOO_SHORT: 'Keywords must be at least 3-character long.',
-    OS_MISPELLED: "Please, be mindful of the good people who gave their life for the name `openSUSE`, which instead you spelled as "
+    OS_MISPELLED: "I'd just like to interject for a moment.  What you're referring to as "
 }
 
 const mispelled = args => args.find(s => s.toLowerCase() === 'opensuse' && s !== 'openSUSE')
@@ -34,9 +34,9 @@ function parse(s) {
         cmd: null,
         args: []
     })
-    let mis = mispelled(args)
+    const mis = mispelled(args)
     if (mis) return {
-        Err: PARSE_ERRORS['OS_MISPELLED'] + '`' + mis + '`. You can use `oS` if you prefer :)'
+        Err: PARSE_ERRORS['OS_MISPELLED'] + '`' + mis + '` is in fact spelled `openSUSE`, and has been since August 2005. Yet it is tolerated that you write `oS` if you prefer ;P'
     }
     if (!cmd) return null
     if (cmd.indexOf('start') > -1) return {
