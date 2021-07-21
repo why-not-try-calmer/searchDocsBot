@@ -36,7 +36,7 @@ function parse(s) {
     })
     const mis = mispelled(args)
     if (mis) return {
-        Err: PARSE_ERRORS['OS_MISPELLED'] + '`' + mis + '` is in fact spelled `openSUSE`, and has been since August 2005. Yet it is tolerated that you write `oS` if you prefer ;P'
+        Err: PARSE_ERRORS['OS_MISPELLED'] + '`' + mis + '` is in fact spelled `openSUSE`, and has been since August 2005. Yet it is tolerated that you write `oS` if you prefer.\nBy the way you can search the openSUSE documentation from here with `/docs <search terms>`'
     }
     if (!cmd) return null
     if (cmd.indexOf('start') > -1) return {
