@@ -12,7 +12,7 @@ const PARSE_ERRORS = {
     OS_MISPELLED: "I'd just like to interject for a moment.  What you're referring to as "
 }
 
-const mispelled = args => args.find(s => s.toLowerCase() === 'opensuse' && s !== 'openSUSE')
+//const mispelled = args => args.find(s => s.toLowerCase() === 'opensuse' && s !== 'openSUSE')
 
 function parse(s) {
     const splitted = s.split(' ')
@@ -34,10 +34,12 @@ function parse(s) {
         cmd: null,
         args: []
     })
+    /*
     const mis = mispelled(args)
     if (mis) return {
         Err: PARSE_ERRORS['OS_MISPELLED'] + '`' + mis + '` is in fact spelled `openSUSE`, and has been since August 2005. Yet it is tolerated that you write `oS` if you prefer.\nBy the way you can search the openSUSE documentation from here with `/docs <search terms>`'
     }
+    */
     if (!cmd) return null
     if (cmd.indexOf('start') > -1) return {
         Ok: 'start'
