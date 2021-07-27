@@ -227,6 +227,6 @@ server.post('/announce', (req, res, next) => {
     return next(false)
 })
 
-Drain.go()
+Drain.run()
 
 server.listen(process.env['PORT'] || 8443)
