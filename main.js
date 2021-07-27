@@ -115,10 +115,12 @@ const reply = (chat_id, keywords, optParams) => {
 }
 
 const bot_handler = (req, res, next) => {
+    // Draining upon bot restart to avoid the avalanche of missed calls
     if (!drained) {
         res.send(200)
         return next(false)
     }
+
     const update = req.body
 
     // Case callback_query update
