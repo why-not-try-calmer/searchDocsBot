@@ -19,6 +19,7 @@ const buildInlineButton = (text, keywords, index) => {
 }
 
 const promoOptParams = {
+    parse_mode: 'Markdown',
     reply_markup: JSON.stringify({
         inline_keyboard: [[
             {
