@@ -204,7 +204,7 @@ server.get('/stats', (_, res, next) => {
 })
 
 server.post('/announce', (req, res, next) => {
-    if (req.body.secret === SECRET) return broadcastAnnouncement()
+    if (req.body.secret === SECRET) return broadcastAnnouncement(req.body.message)
         .catch(e => console.error('Error in /announce: ', e))
         .finally(() => { res.send(200); return next(false) })
     res.send(200)
