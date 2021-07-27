@@ -50,6 +50,10 @@ const renderBroadcastStats = () => renderStats().then(res =>
     Promise.all(res.chatStatsMsgs.map(msg =>
         slimbot.sendMessage(msg.chat_id, msg.text + res.allStatsMsg, promoOptParams))))
 
+const broadcastAnnouncement = announcement => renderStats().then(res =>
+    Promise.all(res.chatStatsMsgs.map(msg =>
+        slimbot.sendMessage(msg.chat_id, announcement, promoOptParams))))
+
 const query_handler = update => {
     const [bot_name, keywords, qindex] = update.callback_query.data.split(':')
     if (bot_name !== 'docs-bot' || bot_name === undefined || keywords === undefined || qindex === undefined) return;
@@ -140,7 +144,7 @@ const bot_handler = (req, res, next) => {
         res.send(200)
         return next(false)
     }
-    
+
     //  ...'/start' message
     if (parsed.Ok === 'start') {
         text = 'Search the docs by simply sending a message following this pattern: \n<search for these words> @openSUSE_docs_bot \nor\n/docs <search for these words>. Use /stats to get some use statistics, and /help to bring up this very message.'
@@ -199,9 +203,9 @@ server.get('/stats', (_, res, next) => {
         .finally(() => { return next(false) })
 })
 
-server.post('/test', (req, res, next) => {
-    if (req.body.secret === SECRET) return renderBroadcastStats()
-        .catch(e => console.error('Error in /test: ', e))
+server.post('/announce', (req, res, next) => {
+    if (req.body.secret === SECRET) return broadcastAnnouncement()
+        .catch(e => console.error('Error in /announce: ', e))
         .finally(() => { res.send(200); return next(false) })
     res.send(200)
     return next(false)
