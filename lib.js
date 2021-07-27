@@ -47,6 +47,9 @@ function parse(s) {
     if (cmd.indexOf('stats') > -1) return {
         Ok: 'stats'
     }
+    if (cmd.indexOf('broadcast') > -1) return {
+        Ok: 'broadcast'
+    }
     args = args.join(' ')
     if (args.trim().length < 3) return {
         Err: PARSE_ERRORS['TOO_SHORT']

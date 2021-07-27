@@ -168,6 +168,10 @@ const bot_handler = (req, res, next) => {
         res.send(200)
         return next(false)
     })
+    // ... '/broadcast' message
+    if (parsed.Ok === 'broadcast' && parsed.args[0] === SECRET) return broadcastAnnouncement(parsed.args[1])
+        .catch(err => console.error('main: broadcast: ', err))
+        .finally(() => { res.send(200); return next(false) })
 
     res.send(200)
     return next(false)
