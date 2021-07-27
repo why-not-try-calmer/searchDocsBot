@@ -11,11 +11,10 @@ server.use(restify.plugins.bodyParser());
 const DOCS_URL = process.env['DOCS_URL']
 const SECRET = process.env['SECRET']
 
-const drained = (() => {
-    let flag = false
-    setTimeout(() => { flag = true, 3000 })
-    return flag
-})()
+const Drain = {
+    flag: false,
+    run: function () { setTimeout(() => this.flag = true, 3000) }
+}
 
 const buildInlineButton = (text, keywords, index) => {
     return {
@@ -116,7 +115,7 @@ const reply = (chat_id, keywords, optParams) => {
 
 const bot_handler = (req, res, next) => {
     // Draining upon bot restart to avoid the avalanche of missed calls
-    if (!drained) {
+    if (!Drain.flag) {
         res.send(200)
         return next(false)
     }
@@ -227,5 +226,7 @@ server.post('/announce', (req, res, next) => {
     res.send(200)
     return next(false)
 })
+
+Drain.go()
 
 server.listen(process.env['PORT'] || 8443)
