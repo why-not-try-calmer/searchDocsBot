@@ -45,10 +45,12 @@ function parse(s) {
         Ok: 'start'
     }
     if (cmd.indexOf('stats') > -1) return {
-        Ok: 'stats'
+        Ok: 'stats',
     }
     if (cmd.indexOf('broadcast') > -1) return {
-        Ok: 'broadcast'
+        Ok: 'broadcast',
+        secret: args.pop(),
+        args: args.join(' ')
     }
     args = args.join(' ')
     if (args.trim().length < 3) return {

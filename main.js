@@ -11,6 +11,12 @@ server.use(restify.plugins.bodyParser());
 const DOCS_URL = process.env['DOCS_URL']
 const SECRET = process.env['SECRET']
 
+const drained = (() => {
+    let flag = false
+    setTimeout(() => { flag = true, 3000 })
+    return flag
+})()
+
 const buildInlineButton = (text, keywords, index) => {
     return {
         text,
@@ -109,6 +115,10 @@ const reply = (chat_id, keywords, optParams) => {
 }
 
 const bot_handler = (req, res, next) => {
+    if (!drained) {
+        res.send(200)
+        return next(false)
+    }
     const update = req.body
 
     // Case callback_query update
@@ -169,7 +179,7 @@ const bot_handler = (req, res, next) => {
         return next(false)
     })
     // ... '/broadcast' message
-    if (parsed.Ok === 'broadcast' && parsed.args[0] === SECRET) return broadcastAnnouncement(parsed.args[1])
+    if (parsed.Ok === 'broadcast' && parsed.secret === SECRET) return broadcastAnnouncement(parsed.args)
         .catch(err => console.error('main: broadcast: ', err))
         .finally(() => { res.send(200); return next(false) })
 
