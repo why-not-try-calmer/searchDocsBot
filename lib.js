@@ -47,10 +47,14 @@ function parse(s) {
     if (cmd.indexOf('stats') > -1) return {
         Ok: 'stats',
     }
-    if (cmd.indexOf('broadcast') > -1) return {
-        Ok: 'broadcast',
-        secret: args.shift(),
-        args: args.join(' ')
+    if (cmd.indexOf('broadcast') > -1) { 
+        const secret = args.shift()
+        const args = args.join(' ')
+        return {
+            Ok: 'broadcast',
+            secret,
+            args
+        }
     }
     args = args.join(' ')
     if (args.trim().length < 3) return {

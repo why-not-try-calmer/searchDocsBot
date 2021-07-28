@@ -139,7 +139,7 @@ const bot_handler = (req, res, next) => {
     const message = update.message
     const message_text = message.text
     const parsed = parse(message_text)
-    console.log(parsed)
+
     // ... but not for us
     if (!parsed) { res.send(200); return next(false) }
 
