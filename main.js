@@ -13,7 +13,7 @@ const SECRET = process.env['SECRET']
 
 const Drain = {
     flag: false,
-    run: function () { setTimeout(() => this.flag = true, 3000) }
+    run() { setTimeout(() => this.flag = true, 3000) }
 }
 
 const buildInlineButton = (text, keywords, index) => {
@@ -179,6 +179,7 @@ const bot_handler = (req, res, next) => {
         res.send(200)
         return next(false)
     })
+    console.log(parsed)
     // ... '/broadcast' message
     if (parsed.Ok === 'broadcast' && parsed.secret === SECRET) return broadcastAnnouncement(parsed.args)
         .catch(err => console.error('main: broadcast: ', err))
