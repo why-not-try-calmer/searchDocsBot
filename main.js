@@ -139,7 +139,7 @@ const bot_handler = (req, res, next) => {
     const message = update.message
     const message_text = message.text
     const parsed = parse(message_text)
-
+    console.log(parsed)
     // ... but not for us
     if (!parsed) { res.send(200); return next(false) }
 
@@ -179,7 +179,6 @@ const bot_handler = (req, res, next) => {
         res.send(200)
         return next(false)
     })
-    console.log(parsed)
     // ... '/broadcast' message
     if (parsed.Ok === 'broadcast' && parsed.secret === SECRET) return broadcastAnnouncement(parsed.args)
         .catch(err => console.error('main: broadcast: ', err))
