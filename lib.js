@@ -49,7 +49,7 @@ function parse(s) {
     }
     if (cmd.indexOf('broadcast') > -1) { 
         const secret = args.shift()
-        const args = args.join(' ')
+        args = args.join(' ')
         return {
             Ok: 'broadcast',
             secret,
