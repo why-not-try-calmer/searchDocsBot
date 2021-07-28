@@ -6,7 +6,7 @@ const DOCS_URL = process.env['DOCS_URL']
 const JSON_BLOB_URL = process.env['JSON_BLOB_URL']
 const DAILY_OFFSET = 43200000
 const PAGES_UPPER_BOUND = 3
-const COMMAND_WORDS = ['/start', '/start@openSUSE_docs_bot', '/docs', '/docs@opensSUSE_docs_bot', '@openSUSE_docs_bot', '/stats', '/stats@openSUSE_docs_bot']
+const COMMAND_WORDS = ['/broadcast', '/start', '/start@openSUSE_docs_bot', '/docs', '/docs@opensSUSE_docs_bot', '@openSUSE_docs_bot', '/stats', '/stats@openSUSE_docs_bot']
 const PARSE_ERRORS = {
     TOO_SHORT: 'Keywords must be at least 3-character long.',
     OS_MISPELLED: "I'd just like to interject for a moment.  What you're referring to as "
