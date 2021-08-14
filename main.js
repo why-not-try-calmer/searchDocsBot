@@ -122,7 +122,7 @@ const reply = (chat_id, keywords, optParams) => {
                 text: 'Next ' + '1/' + found.length.toString(),
                 callback_data: 'docs-bot:' + keywords + ':' + '1'
             }
-        ]]
+        ], ...defaultLowerKeyboard]
     })
     slimbot.sendMessage(chat_id, text, optParams)
     return Searches.storeKeywordChat(keywords, chat_id)
