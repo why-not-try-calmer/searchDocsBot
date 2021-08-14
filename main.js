@@ -23,20 +23,33 @@ const buildInlineButton = (text, keywords, index) => {
     }
 }
 
-const promoOptParams = {
+const defaultLowerKeyboard = [
+    [
+        {
+            text: 'Telegram chat!',
+            url: 'https://t.me/opensuse_docs'
+        },
+        {
+            text: 'GitHub',
+            url: 'https://github.com/openSUSE/openSUSE-docs-revamped-temp'
+        }
+    ],
+    [
+        {
+            text: 'Activities',
+            url: 'https://lists.opensuse.org/archives/list/doc@lists.opensuse.org/latest'
+        },
+        {
+            text: 'Plans',
+            url: 'https://en.opensuse.org/openSUSE:Documentation_migration'
+        }
+    ]
+]
+
+const defaultOptParams = {
     parse_mode: 'Markdown',
     reply_markup: JSON.stringify({
-        inline_keyboard: [[
-            {
-                text: 'Get involved!',
-                url: 'https://t.me/opensuse_docs'
-            }
-        ], [
-            {
-                text: 'Visit our GitHub',
-                url: 'https://github.com/openSUSE/openSUSE-docs-revamped-temp'
-            }
-        ]]
+        inline_keyboard: defaultLowerKeyboard
     })
 }
 
@@ -54,11 +67,11 @@ const renderStats = () => Searches.unstoreKeywordsChats().then(docs => {
 
 const renderBroadcastStats = () => renderStats().then(res =>
     Promise.all(res.chatStatsMsgs.map(msg =>
-        slimbot.sendMessage(msg.chat_id, msg.text + res.allStatsMsg, promoOptParams))))
+        slimbot.sendMessage(msg.chat_id, msg.text + res.allStatsMsg, defaultOptParams))))
 
 const broadcastAnnouncement = announcement => renderStats().then(res =>
     Promise.all(res.chatStatsMsgs.map(msg =>
-        slimbot.sendMessage(msg.chat_id, announcement, promoOptParams))))
+        slimbot.sendMessage(msg.chat_id, announcement, defaultOptParams))))
 
 const query_handler = update => {
     const [bot_name, keywords, qindex] = update.callback_query.data.split(':')
@@ -79,7 +92,9 @@ const query_handler = update => {
     const optParams = {
         reply_markup: current_index > 0 ?
             JSON.stringify({ inline_keyboard: [first_row, [{ text: 'Reset', callback_data: 'docs-bot:' + keywords + ':0' }]] }) :
-            JSON.stringify({ inline_keyboard: [first_row] })
+            JSON.stringify({
+                inline_keyboard: [...first_row, defaultLowerKeyboard]
+            })
     }
     slimbot.editMessageText(chat_id, message_id, text, optParams)
 }
@@ -175,7 +190,7 @@ const bot_handler = (req, res, next) => {
         const { chatStatsMsgs, allStatsMsg } = stats
         const found = chatStatsMsgs.find(d => parseInt(d.chat_id) === chat_id)
         const text = found ? found.text + allStatsMsg : 'No stats on this chat. ' + allStatsMsg
-        slimbot.sendMessage(chat_id, text, promoOptParams)
+        slimbot.sendMessage(chat_id, text, defaultOptParams)
         res.send(200)
         return next(false)
     })
