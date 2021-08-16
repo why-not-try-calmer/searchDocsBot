@@ -1,4 +1,4 @@
-const { Searches, parse } = require('./lib.js')
+const { Searches, parseMessageContents } = require('./lib.js')
 const Slimbot = require('slimbot');
 const restify = require('restify');
 
@@ -16,10 +16,10 @@ const Drain = {
     run() { setTimeout(() => this.flag = true, 3000) }
 }
 
-const buildInlineButton = (text, keywords, index) => {
+const buildInlineButton = (text, distro, keywords, index) => {
     return {
         text,
-        callback_data: 'docs-bot:' + keywords + ':' + index.toString()
+        callback_data: 'docs-bot:' + distro + ':' + keywords + ':' + index.toString()
     }
 }
 
@@ -65,19 +65,15 @@ const renderStats = () => Searches.unstoreKeywordsChats().then(docs => {
     return { chatStatsMsgs, allStatsMsg }
 })
 
-const renderBroadcastStats = () => renderStats().then(res =>
-    Promise.all(res.chatStatsMsgs.map(msg =>
-        slimbot.sendMessage(msg.chat_id, msg.text + res.allStatsMsg, defaultOptParams))))
-
 const broadcastAnnouncement = announcement => renderStats().then(res =>
     Promise.all(res.chatStatsMsgs.map(msg =>
         slimbot.sendMessage(msg.chat_id, announcement, defaultOptParams))))
 
 const query_handler = update => {
-    const [bot_name, keywords, qindex] = update.callback_query.data.split(':')
+    const [bot_name, distro, keywords, qindex] = update.callback_query.data.split(':')
     if (bot_name !== 'docs-bot' || bot_name === undefined || keywords === undefined || qindex === undefined) return;
 
-    const pages = Searches.g(keywords)
+    const pages = Searches.g(keywords, distro)
     const current_index = parseInt(qindex)
     const text = pages[current_index].join('\n')
 
@@ -85,22 +81,22 @@ const query_handler = update => {
     const chat_id = update.callback_query.message.chat.id
     const first_row = []
 
-    if (current_index > 0) first_row.push(buildInlineButton('Back', keywords, current_index - 1))
-    first_row.push({ text: (current_index + 1).toString() + '/' + pages.length.toString(), callback_data: 'docs-bot:' + keywords + ':' + current_index.toString() })
-    if (current_index + 1 < pages.length) first_row.push(buildInlineButton('Next', keywords, current_index + 1))
+    if (current_index > 0) first_row.push(buildInlineButton('Back', distro, keywords, current_index - 1))
+    first_row.push({ text: (current_index + 1).toString() + '/' + pages.length.toString(), callback_data: 'docs-bot:' + distro + ':' + keywords + ':' + current_index.toString() })
+    if (current_index + 1 < pages.length) first_row.push(buildInlineButton('Next', distro, keywords, current_index + 1))
 
     const optParams = {
         reply_markup: current_index > 0 ?
-            JSON.stringify({ inline_keyboard: [first_row, [{ text: 'Reset', callback_data: 'docs-bot:' + keywords + ':0' }]] }) :
+            JSON.stringify({ inline_keyboard: [first_row, [{ text: 'Reset', callback_data: 'docs-bot:' + distro + ':' + keywords + ':0' }]] }) :
             JSON.stringify({
-                inline_keyboard: [first_row, ...defaultLowerKeyboard]
+                inline_keyboard: [first_row, [buildInlineButton('Search ' + distro === 'tw' ? 'Leap' : 'Tumbleweed' + ' docs instead?', distro === 'tw' ? 'leap' : 'tw', keywords, 0)], ...defaultLowerKeyboard]
             })
     }
     slimbot.editMessageText(chat_id, message_id, text, optParams)
 }
 
 const reply = (chat_id, keywords, optParams) => {
-    const found = Searches.g(keywords)
+    const found = Searches.g(keywords, 'tw')
     let text;
 
     if (found.length === 0) {
@@ -117,12 +113,13 @@ const reply = (chat_id, keywords, optParams) => {
     }
 
     optParams.reply_markup = JSON.stringify({
-        inline_keyboard: [[
-            {
-                text: 'Next ' + '1/' + found.length.toString(),
-                callback_data: 'docs-bot:' + keywords + ':' + '1'
-            }
-        ], ...defaultLowerKeyboard]
+        inline_keyboard: [
+            [
+                {
+                    text: 'Next ' + '1/' + found.length.toString(),
+                    callback_data: 'docs-bot:tw:' + keywords + ':1'
+                }
+            ], [{ text: 'Search Leap docs instead?', callback_data: 'docs-bot:leap:' + keywords + ':0' }], ...defaultLowerKeyboard]
     })
     slimbot.sendMessage(chat_id, text, optParams)
     return Searches.storeKeywordChat(keywords, chat_id)
@@ -153,7 +150,7 @@ const bot_handler = (req, res, next) => {
     // Case message update
     const message = update.message
     const message_text = message.text
-    const parsed = parse(message_text)
+    const parsed = parseMessageContents(message_text)
 
     // ... but not for us
     if (!parsed) { res.send(200); return next(false) }
@@ -190,7 +187,8 @@ const bot_handler = (req, res, next) => {
         const { chatStatsMsgs, allStatsMsg } = stats
         const found = chatStatsMsgs.find(d => parseInt(d.chat_id) === chat_id)
         const text = found ? found.text + allStatsMsg : 'No stats on this chat. ' + allStatsMsg
-        slimbot.sendMessage(chat_id, text, defaultOptParams)
+        defaultOptParams.
+            slimbot.sendMessage(chat_id, text, defaultOptParams)
         res.send(200)
         return next(false)
     })
@@ -214,13 +212,13 @@ server.get('/wakeup', (_, res, next) => {
 })
 
 server.get('/search/:keywords', (req, res, next) => {
-    const parsed = parse('/docs ' + req.params.keywords)
+    const parsed = parseMessageContents('/docs ' + req.params.keywords)
     if (parsed.Err) {
         res.json("Couldn't parse your input: " + parsed.Err)
         return next(false)
     }
     if (parsed.Ok === 'search') {
-        const found = Searches.g(parsed.args)
+        const found = Searches.g(parsed.args, 'tw')
         if (found.length === 0) { res.json('No result for this query string: ' + req.params.keywords); return next(false) }
         res.json(found[0])
         return next(false)
