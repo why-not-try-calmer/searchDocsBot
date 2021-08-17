@@ -187,8 +187,7 @@ const bot_handler = (req, res, next) => {
         const { chatStatsMsgs, allStatsMsg } = stats
         const found = chatStatsMsgs.find(d => parseInt(d.chat_id) === chat_id)
         const text = found ? found.text + allStatsMsg : 'No stats on this chat. ' + allStatsMsg
-        defaultOptParams.
-            slimbot.sendMessage(chat_id, text, defaultOptParams)
+        slimbot.sendMessage(chat_id, text, defaultOptParams)
         res.send(200)
         return next(false)
     })
