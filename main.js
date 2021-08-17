@@ -89,7 +89,7 @@ const query_handler = update => {
         reply_markup: current_index > 0 ?
             JSON.stringify({ inline_keyboard: [first_row, [{ text: 'Reset', callback_data: 'docs-bot:' + distro + ':' + keywords + ':0' }]] }) :
             JSON.stringify({
-                inline_keyboard: [first_row, [buildInlineButton('Search ' + distro === 'tw' ? 'Leap' : 'Tumbleweed' + ' docs instead?', distro === 'tw' ? 'leap' : 'tw', keywords, 0)], ...defaultLowerKeyboard]
+                inline_keyboard: [first_row, [buildInlineButton('Tumbleweed/Leap', distro === 'tw' ? 'leap' : 'tw', keywords, 0)], ...defaultLowerKeyboard]
             })
     }
     slimbot.editMessageText(chat_id, message_id, text, optParams)
