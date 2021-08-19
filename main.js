@@ -98,6 +98,8 @@ const query_handler = update => {
 const reply = (chat_id, keywords, optParams) => {
     const found = Searches.g(keywords, 'tw')
     let text;
+    let inline_keyboard = [[{ text: 'Search Leap docs instead?', callback_data: 'docs-bot:leap:' + keywords + ':0' }], ...defaultLowerKeyboard]
+    optParams.reply_markup = JSON.stringify({ inline_keyboard })
 
     if (found.length === 0) {
         text = 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
@@ -112,15 +114,11 @@ const reply = (chat_id, keywords, optParams) => {
         return Promise.resolve()
     }
 
-    optParams.reply_markup = JSON.stringify({
-        inline_keyboard: [
-            [
-                {
-                    text: 'Next ' + '1/' + found.length.toString(),
-                    callback_data: 'docs-bot:tw:' + keywords + ':1'
-                }
-            ], [{ text: 'Search Leap docs instead?', callback_data: 'docs-bot:leap:' + keywords + ':0' }], ...defaultLowerKeyboard]
-    })
+    inline_keyboard.unshift([{
+        text: 'Next ' + '1/' + found.length.toString(),
+        callback_data: 'docs-bot:tw:' + keywords + ':1'
+    }])
+    optParams.reply_markup = JSON.stringify({ inline_keyboard })
     slimbot.sendMessage(chat_id, text, optParams)
     return Searches.storeKeywordChat(keywords, chat_id)
 }
