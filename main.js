@@ -75,7 +75,7 @@ const query_handler = update => {
 
     const pages = Searches.g(keywords, distro)
     const current_index = parseInt(qindex)
-    const text = pages ? pages[current_index].join('\n') : `Sorry, no result for ${keywords} in the documentation for ${distro}.` 
+    const text = pages && pages.length > 0 ? pages[current_index].join('\n') : `Sorry, no result for ${keywords} in the documentation for ${distro}.` 
 
     const message_id = update.callback_query.message.message_id
     const chat_id = update.callback_query.message.chat.id
