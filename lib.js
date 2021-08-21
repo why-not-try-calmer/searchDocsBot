@@ -1,9 +1,11 @@
 const lunr = require('lunr')
 const fetch = require('node-fetch')
+const parser = require('node-html-parser')
 const { dbDo } = require('./db.js')
 
-const DOCS_URL = process.env['DOCS_URL']
-const JSON_BLOB_URL = process.env['JSON_BLOB_URL']
+const TW_DOCS_URL = process.env['TW_DOCS_URL']
+const TW_DOCS_JSON_URL = process.env['TW_DOCS_JSON_URL']
+const LEAP_DOCS_URL = process.env['LEAP_DOCS_URL']
 const DAILY_OFFSET = 43200000
 const PAGES_UPPER_BOUND = 3
 const COMMAND_WORDS = ['/broadcast', '/start', '/start@openSUSE_docs_bot', '/docs', '/docs@opensSUSE_docs_bot', '@openSUSE_docs_bot', '/stats', '/stats@openSUSE_docs_bot']
@@ -12,9 +14,43 @@ const PARSE_ERRORS = {
     OS_MISPELLED: "I'd just like to interject for a moment.  What you're referring to as "
 }
 
-//const mispelled = args => args.find(s => s.toLowerCase() === 'opensuse' && s !== 'openSUSE')
+function getLeapParse() {
+    return fetch(LEAP_DOCS_URL)
+        .then(response => response.text())
+        .then(text => {
+            const root = parser.parse(text)
+            const sections = root.querySelectorAll('div[class^="sect"]')
+            const results = []
+            for (const sec of sections) {
+                let name = sec.querySelector('span.name')
+                let number = sec.querySelector('.number')
+                if (!number || !name) { continue }
+                name = name.text
+                number = number.text.trim()
+                const permalink = sec.querySelector('a.permalink').getAttribute('href')
+                const contents = sec.querySelectorAll('p').join('')
+                results.push({ name, permalink, number, contents })
+            }
+            return results
+        })
+}
 
-function parse(s) {
+function toLeapIndex(soup) {
+    return lunr(function () {
+        this.ref('permalink')
+        this.field('text')
+        for (const s of soup) {
+            this.add({ 'name': s.name, 'text': s.contents, 'permalink': s.permalink })
+        }
+    })
+}
+
+function makeLeapIndex() {
+    return getLeapParse().then(soup => toLeapIndex(soup))
+}
+
+
+function parseMessageContents(s) {
     const splitted = s.split(' ')
     let {
         cmd,
@@ -34,12 +70,6 @@ function parse(s) {
         cmd: null,
         args: []
     })
-    /*
-    const mis = mispelled(args)
-    if (mis) return {
-        Err: PARSE_ERRORS['OS_MISPELLED'] + '`' + mis + '` is in fact spelled `openSUSE`, and has been since August 2005. Yet it is tolerated that you write `oS` if you prefer.\nBy the way you can search the openSUSE documentation from here with `/docs <search terms>`'
-    }
-    */
     if (!cmd) return null
     if (cmd.indexOf('start') > -1) return {
         Ok: 'start'
@@ -47,7 +77,7 @@ function parse(s) {
     if (cmd.indexOf('stats') > -1) return {
         Ok: 'stats',
     }
-    if (cmd.indexOf('broadcast') > -1) { 
+    if (cmd.indexOf('broadcast') > -1) {
         const secret = args.shift()
         args = args.join(' ')
         return {
@@ -66,15 +96,8 @@ function parse(s) {
     }
 }
 
-function search(s, blob) {
-    const idx = lunr(function () {
-        this.ref('location')
-        this.field('text')
-        blob.docs.forEach(function (doc) {
-            this.add(doc)
-        }, this)
-    })
-    return idx.search(s).map((l, i) => (i + 1).toString() + ') ' + DOCS_URL + '/' + l.ref)
+function search(s, idx, distro) {
+    return idx.search(s).map((l, i) => (i + 1).toString() + ') ' + (distro === 'tw' ? TW_DOCS_URL : LEAP_DOCS_URL) + '/' + l.ref)
 }
 
 function partition(arr) {
@@ -99,33 +122,42 @@ function collectChats(docs) {
 }
 
 const Searches = (() => {
-    const searches = new Map()
-    let blob = {}
+    const searches = { leap: new Map(), tw: new Map() }
+    let indexes = { leap: null, tw: null }
     let last_time = new Date().getTime()
     return {
         init() {
-            return fetch(JSON_BLOB_URL)
+            return fetch(TW_DOCS_JSON_URL)
                 .then(res => res.json())
-                .then(res => {
-                    blob = res
-                    searches.forEach((_, k) => searches.set(k, partition(search(k, blob))))
-                    console.log('Searches initialized.')
+                .then(blob => {
+                    indexes.tw = lunr(function () {
+                        this.ref('location')
+                        this.field('text')
+                        blob.docs.forEach(function (doc) {
+                            this.add(doc)
+                        }, this)
+                    })
+                    console.log('Tumbleweed index ready.')
+                    return makeLeapIndex()
+                })
+                .then(leap_idx => {
+                    indexes.leap = leap_idx
+                    console.log('Leap index ready.\nApp successfully initialized.')
                 })
                 .catch(err => console.error(err))
         },
-        g(keywords) {
-            let res;
-            res = searches.get(keywords)
+        g(keywords, distro) {
+            let res = searches[distro].get(keywords)
             if (res === undefined) {
-                res = search(keywords, blob)
+                res = search(keywords, indexes[distro], distro)
                 if (res.length > 0) {
                     res = partition(res)
-                    this.s(keywords, res)
+                    this.s(keywords, res, distro)
                 }
             }
             return res
         },
-        s(keywords, partitioned) { if (!searches.has(keywords)) searches.set(keywords, partitioned) },
+        s(keywords, partitioned, distro) { if (!searches[distro].has(keywords)) searches[distro].set(keywords, partitioned) },
         refreshNeeded() {
             const now = new Date().getTime()
             return ((now - last_time) > DAILY_OFFSET)
@@ -140,4 +172,4 @@ const Searches = (() => {
     }
 })()
 Searches.init()
-module.exports = { Searches, parse }
+module.exports = { Searches, parseMessageContents }
