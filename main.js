@@ -75,14 +75,14 @@ const query_handler = update => {
 
     const pages = Searches.g(keywords, distro)
     const current_index = parseInt(qindex)
-    const text = pages && pages.length > 0 ? pages[current_index].join('\n') : `Sorry, no result for ${keywords} in the documentation for ${distro}.` 
+    const text = pages.length > 0 ? pages[current_index].join('\n') : `Sorry, no result for ${keywords} in the documentation for ${distro}.` 
 
     const message_id = update.callback_query.message.message_id
     const chat_id = update.callback_query.message.chat.id
     const first_row = []
 
     if (current_index > 0) first_row.push(buildInlineButton('Back', distro, keywords, current_index - 1))
-    first_row.push({ text: (current_index + 1).toString() + '/' + pages.length.toString(), callback_data: `docs-bot:${distro}:${keywords}:${current_index.toString()}` })
+    if (pages.length > 0) first_row.push({ text: (current_index + 1).toString() + '/' + pages.length.toString(), callback_data: `docs-bot:${distro}:${keywords}:${current_index.toString()}` })
     if (current_index + 1 < pages.length) first_row.push(buildInlineButton('Next', distro, keywords, current_index + 1))
 
     const optParams = {
