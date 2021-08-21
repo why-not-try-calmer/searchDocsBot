@@ -19,7 +19,7 @@ const Drain = {
 const buildInlineButton = (text, distro, keywords, index) => {
     return {
         text,
-        callback_data: `${docs-bot}:${distro}:${keywords}:${index.toString()}`
+        callback_data: `docs-bot:${distro}:${keywords}:${index.toString()}`
     }
 }
 
