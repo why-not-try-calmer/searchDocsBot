@@ -19,7 +19,7 @@ const Drain = {
 const buildInlineButton = (text, distro, keywords, index) => {
     return {
         text,
-        callback_data: 'docs-bot:' + distro + ':' + keywords + ':' + index.toString()
+        callback_data: `${docs-bot}:${distro}:${keywords}:${index.toString()}`
     }
 }
 
@@ -75,19 +75,19 @@ const query_handler = update => {
 
     const pages = Searches.g(keywords, distro)
     const current_index = parseInt(qindex)
-    const text = pages[current_index].join('\n')
+    const text = pages ? pages[current_index].join('\n') : `Sorry, no result for ${keywords} in the documentation for ${distro}.` 
 
     const message_id = update.callback_query.message.message_id
     const chat_id = update.callback_query.message.chat.id
     const first_row = []
 
     if (current_index > 0) first_row.push(buildInlineButton('Back', distro, keywords, current_index - 1))
-    first_row.push({ text: (current_index + 1).toString() + '/' + pages.length.toString(), callback_data: 'docs-bot:' + distro + ':' + keywords + ':' + current_index.toString() })
+    first_row.push({ text: (current_index + 1).toString() + '/' + pages.length.toString(), callback_data: `docs-bot:${distro}:${keywords}:${current_index.toString()}` })
     if (current_index + 1 < pages.length) first_row.push(buildInlineButton('Next', distro, keywords, current_index + 1))
 
     const optParams = {
         reply_markup: current_index > 0 ?
-            JSON.stringify({ inline_keyboard: [first_row, [{ text: 'Reset', callback_data: 'docs-bot:' + distro + ':' + keywords + ':0' }]] }) :
+            JSON.stringify({ inline_keyboard: [first_row, [{ text: 'Reset', callback_data: `docs-bot:${distro}:${keywords}:0` }]] }) :
             JSON.stringify({
                 inline_keyboard: [first_row, [buildInlineButton('Tumbleweed/Leap', distro === 'tw' ? 'leap' : 'tw', keywords, 0)], ...defaultLowerKeyboard]
             })
@@ -98,11 +98,11 @@ const query_handler = update => {
 const reply = (chat_id, keywords, optParams) => {
     const found = Searches.g(keywords, 'tw')
     let text;
-    let inline_keyboard = [[{ text: 'Search Leap docs instead?', callback_data: 'docs-bot:leap:' + keywords + ':0' }], ...defaultLowerKeyboard]
+    let inline_keyboard = [[{ text: 'Search Leap docs instead?', callback_data: `docs-bot:leap:${keywords}:0` }], ...defaultLowerKeyboard]
     optParams.reply_markup = JSON.stringify({ inline_keyboard })
 
     if (found.length === 0) {
-        text = 'No result about this yet, but keep tabs on ' + DOCS_URL + ' in the upcoming days'
+        text = `No result about this yet, but keep tabs on ${DOCS_URL} in the upcoming days`
         slimbot.sendMessage(chat_id, text, optParams)
         return Promise.resolve()
     }
