@@ -1,4 +1,4 @@
-![alt text](https://github.com/why-not-try-calmer/feedfarer2/blob/master/screenshot.png?raw=true)
+![alt text](https://github.com/why-not-try-calmer/searchDocsBot/blob/master/screenshot.png?raw=true)
 
 ## How to use
 ### Telegram
