@@ -1,3 +1,5 @@
+![alt text](https://github.com/why-not-try-calmer/searchDocsBot/blob/master/screenshot.png?raw=true)
+
 ## How to use
 ### Telegram
 Search the docs by simply sending a message following this pattern: 
