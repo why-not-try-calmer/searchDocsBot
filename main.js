@@ -1,12 +1,12 @@
-const { Searches, parseMessageContents } = require('./lib.js')
-const Slimbot = require('slimbot');
-const restify = require('restify');
+import { Searches, parseMessageContents } from './lib.js';
+import Slimbot from 'slimbot';
+import { createServer, plugins } from 'restify';
 
 const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN'])
 // slimbot.setWebhook({ url: process.env['BOT_ENDPOINT'] })
 
-const server = restify.createServer();
-server.use(restify.plugins.bodyParser());
+const server = createServer();
+server.use(plugins.bodyParser());
 
 const DOCS_URL = process.env['DOCS_URL']
 const SECRET = process.env['SECRET']

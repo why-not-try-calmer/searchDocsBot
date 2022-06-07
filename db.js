@@ -1,4 +1,4 @@
-const { MongoClient } = require('mongodb')
+import { MongoClient } from 'mongodb'
 const DB_URI = process.env['DB_URI']
 const DB_NAME = 'searchDocsBot'
 const client = new MongoClient(DB_URI, { useNewUrlParser: true, useUnifiedTopology: true })
@@ -63,4 +63,4 @@ const dbDo = (() => {
     }
 })()
 dbDo.init()
-module.exports = { dbDo }
+export default { dbDo }

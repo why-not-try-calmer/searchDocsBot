@@ -1,7 +1,7 @@
-const lunr = require('lunr')
-const fetch = require('node-fetch')
-const parser = require('node-html-parser')
-const { dbDo } = require('./db.js')
+import lunr from 'lunr'
+import fetch from 'node-fetch'
+import { parse } from 'node-html-parser'
+import dbDo from './db.js'
 
 const TW_DOCS_URL = process.env['TW_DOCS_URL']
 const TW_DOCS_JSON_URL = process.env['TW_DOCS_JSON_URL']
@@ -18,7 +18,7 @@ function getLeapParse() {
     return fetch(LEAP_DOCS_URL)
         .then(response => response.text())
         .then(text => {
-            const root = parser.parse(text)
+            const root = parse(text)
             const sections = root.querySelectorAll('div[class^="sect"]')
             const results = []
             for (const sec of sections) {
@@ -172,4 +172,4 @@ const Searches = (() => {
     }
 })()
 Searches.init()
-module.exports = { Searches, parseMessageContents }
+export { Searches, parseMessageContents }
