@@ -63,4 +63,4 @@ const dbDo = (() => {
     }
 })()
 dbDo.init()
-export default { dbDo }
+export { dbDo }

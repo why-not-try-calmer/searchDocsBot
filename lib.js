@@ -1,7 +1,7 @@
 import lunr from 'lunr'
 import fetch from 'node-fetch'
 import { parse } from 'node-html-parser'
-import dbDo from './db.js'
+import { dbDo } from './db.js'
 
 const TW_DOCS_URL = process.env['TW_DOCS_URL']
 const TW_DOCS_JSON_URL = process.env['TW_DOCS_JSON_URL']
