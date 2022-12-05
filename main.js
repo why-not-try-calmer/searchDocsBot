@@ -3,7 +3,8 @@ import Slimbot from 'slimbot';
 import { createServer, plugins } from 'restify';
 
 const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN'])
-// slimbot.setWebhook({ url: process.env['BOT_ENDPOINT'] })
+const webhook_url = process.env['HOST'] + process.env['ENDPOINT'] + '/bot' + process.env['TELEGRAM_TOKEN']
+slimbot.setWebhook({ url: webhook_url })
 
 const server = createServer();
 server.use(plugins.bodyParser());
