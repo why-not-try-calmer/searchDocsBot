@@ -5,7 +5,7 @@ import { createServer, plugins } from 'restify';
 const slimbot = new Slimbot(process.env['TOKEN'])
 const endpoint = process.env['ENDPOINT']
 const bot_endpoint = endpoint + '/bot' + process.env['TOKEN']
-const webhook_url = process.env['HOST'] + endpoint
+const webhook_url = process.env['HOST'] + bot_endpoint
 slimbot.setWebhook({ url: webhook_url })
 
 const server = createServer();
