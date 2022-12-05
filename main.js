@@ -3,7 +3,9 @@ import Slimbot from 'slimbot';
 import { createServer, plugins } from 'restify';
 
 const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN'])
-const webhook_url = process.env['HOST'] + process.env['ENDPOINT'] + '/bot' + process.env['TELEGRAM_TOKEN']
+const endpoint = process.env['ENDPOINT']
+const bot_endpoint = endpoint + '/bot' + process.env['TELEGRAM_TOKEN']
+const webhook_url = process.env['HOST'] + endpoint
 slimbot.setWebhook({ url: webhook_url })
 
 const server = createServer();
@@ -199,9 +201,9 @@ const bot_handler = (req, res, next) => {
     return next(false)
 }
 
-server.post('/bot_updates', bot_handler)
+server.post(bot_endpoint, bot_handler)
 
-server.get('/wakeup', (_, res, next) => {
+server.get(endpoint + '/wakeup', (_, res, next) => {
     if (Searches.refreshNeeded()) return Searches.init()
         .catch(err => console.error('This error occurred ', err))
         .finally(() => { res.send(200); return next(false) })
@@ -209,7 +211,7 @@ server.get('/wakeup', (_, res, next) => {
     return next(false)
 })
 
-server.get('/search/:keywords', (req, res, next) => {
+server.get(endpoint + '/search/:keywords', (req, res, next) => {
     const parsed = parseMessageContents('/docs ' + req.params.keywords)
     if (parsed.Err) {
         res.json("Couldn't parse your input: " + parsed.Err)
@@ -223,14 +225,14 @@ server.get('/search/:keywords', (req, res, next) => {
     }
 })
 
-server.get('/stats', (_, res, next) => {
+server.get(endpoint + '/stats', (_, res, next) => {
     return Searches.unstoreKeywordsChats()
         .then(docs => res.json(docs))
         .catch(e => res.json('Sorry, this error occurred: ' + e))
         .finally(() => { return next(false) })
 })
 
-server.post('/announce', (req, res, next) => {
+server.post(endpoint + '/announce', (req, res, next) => {
     if (req.body.secret === SECRET) return broadcastAnnouncement(req.body.message)
         .catch(e => console.error('Error in /announce: ', e))
         .finally(() => { res.send(200); return next(false) })
