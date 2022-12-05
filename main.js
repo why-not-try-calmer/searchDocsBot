@@ -2,9 +2,9 @@ import { Searches, parseMessageContents } from './lib.js';
 import Slimbot from 'slimbot';
 import { createServer, plugins } from 'restify';
 
-const slimbot = new Slimbot(process.env['TELEGRAM_TOKEN'])
+const slimbot = new Slimbot(process.env['TOKEN'])
 const endpoint = process.env['ENDPOINT']
-const bot_endpoint = endpoint + '/bot' + process.env['TELEGRAM_TOKEN']
+const bot_endpoint = endpoint + '/bot' + process.env['TOKEN']
 const webhook_url = process.env['HOST'] + endpoint
 slimbot.setWebhook({ url: webhook_url })
 
